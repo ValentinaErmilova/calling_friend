@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>Calling friend</title>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+    <h1>Registration</h1>
+
+    <form th:object="${registration}" method="post">
+
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label>First name</label>
+                <input class="form-control" type="text" th:field="*{firstname}" placeholder="Enter first name" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Last name</label>
+                <input class="form-control" type="text" th:field="*{lastname}" placeholder="Enter last name" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Age</label>
+                <input type="text" th:field="*{age}" class="form-control" placeholder="Enter age" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="col-md-4 mb-3">
+                <label>Phone number</label>
+                <input class="form-control" type="tel" th:field="*{phonenumber}" placeholder="Enter rhone number"
+                       required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Email address</label>
+                <input class="form-control" type="email" th:field="*{email}" placeholder="Enter email" required>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label>Password</label>
+                <input class="form-control" type="password" th:field="*{password}" placeholder="Password" required>
+            </div>
+        </div>
+
+        <button action="#" th:action="@{/registration}" class="btn btn-primary" type="submit">Registration</button>
+
+    </form>
+</div>
+
+
+</body>
+
+</html>
