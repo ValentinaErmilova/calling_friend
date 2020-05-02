@@ -1,20 +1,36 @@
 package com.company.service;
 
-import com.company.repository.UserRepository;
+import com.company.model.User;
+import com.company.dao.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
 
     @Autowired
-    UserRepository userRepository;
+    UserDAO userRepository;
 
-    public boolean login(String email, String password){
-        if(userRepository.login(email,password) == 1){
+
+    PasswordEncoder encoder = new BCryptPasswordEncoder();
+
+
+    public boolean login(User user){
+        String hash = userRepository.login(user.getEmail());
+
+        if(encoder.matches(user.getPassword(),hash)){
             return true;
         }else {
             return false;
         }
+    }
+
+    public void save(User user){
+        user.setPassword(encoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 }

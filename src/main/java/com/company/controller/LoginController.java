@@ -1,7 +1,7 @@
 package com.company.controller;
 
 import com.company.model.User;
-import com.company.repository.UserRepository;
+import com.company.dao.UserDAO;
 import com.company.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserDAO userRepository;
     @Autowired
-    private UserService dbService;
+    private UserService userService;
 
     @GetMapping("/historyCall")
     public String mainForm(Model model){
@@ -28,9 +28,8 @@ public class LoginController {
 
     @PostMapping("/historyCall")
     public String mainForm(ModelMap model, @ModelAttribute User user){
-        System.out.println("!!!!!");
-        System.out.println(user);
-        if(dbService.login(user.getEmail(),user.getPassword())){
+
+        if(userService.login(user)){
             return "result";
         }else {
             model.addAttribute("historyCall",user);

@@ -22,12 +22,12 @@
         <div class="form-col">
             <div class="col-md-4 mb-3">
                 <label>Login</label>
-                <input class="form-control" type="email" th:field="*{email}" placeholder="Enter first name" required>
+                <input class="form-control" type="email" th:field="*{email}" placeholder="Enter login" required>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label>Password</label>
-                <input class="form-control" type="password" th:field="*{password}" placeholder="Enter last name" required>
+                <input class="form-control" type="password" th:field="*{password}" placeholder="Enter password" required>
             </div>
 
 
@@ -35,11 +35,9 @@
                 <button action="#" th:action="@{/historyCall}" class="btn btn-primary" type="submit">Login</button>
             </div>
 
-
         </div>
 
     </form>
-
 
     <form action="/registration" th:method="get" class="needs-validation" novalidate>
         <div class="col-md-4 mb-3">
