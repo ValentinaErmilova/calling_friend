@@ -12,6 +12,7 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Integer> {
     List<User> findAll();
 
-    @Query(value = "SELECT COUNT(*) FROM users u WHERE u.email = :email and u.password = crypt(:password, u.password)", nativeQuery = true)
-    int login(@Param("email") String name, @Param("password") String password);
+    @Query(value = "SELECT u.password FROM users u WHERE u.email = :email", nativeQuery = true)
+    String login(@Param("email") String name);
+
 }
