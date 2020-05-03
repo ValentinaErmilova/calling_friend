@@ -21,14 +21,12 @@ public class LoginController {
 
     @GetMapping("/historyCall")
     public String mainForm(Model model){
-        System.out.println("11111");
         model.addAttribute("historyCall",new User());
         return "historyCall";
     }
 
     @PostMapping("/historyCall")
     public String mainForm(ModelMap model, @ModelAttribute User user){
-
         if(userService.login(user)){
             return "result";
         }else {

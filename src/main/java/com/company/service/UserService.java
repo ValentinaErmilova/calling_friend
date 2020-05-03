@@ -15,12 +15,11 @@ public class UserService {
     @Autowired
     UserDAO userRepository;
 
-
     PasswordEncoder encoder = new BCryptPasswordEncoder();
 
 
     public boolean login(User user){
-        String hash = userRepository.login(user.getEmail());
+        String hash = userRepository.getPasswordHash(user.getEmail());
 
         if(encoder.matches(user.getPassword(),hash)){
             return true;

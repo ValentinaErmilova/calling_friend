@@ -18,14 +18,12 @@ public class RegistrationController {
 
     @GetMapping("/registration")
     public String registration(Model model){
-        System.out.println("!1");
         model.addAttribute("registration",new User());
         return "registration";
     }
 
     @PostMapping("/registration")
     public String registration(@ModelAttribute User user){
-        System.out.println("!2");
         userService.save(user);
         return "result";
     }
