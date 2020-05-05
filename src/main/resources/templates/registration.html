@@ -15,7 +15,7 @@
 <div class="container-fluid">
     <h1>Registration</h1>
 
-    <form th:object="${registration}" method="post">
+    <form th:object="${registration}" th:action="@{/registration}" method="post">
 
         <div class="form-row">
             <div class="col-md-4 mb-3">
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <button action="#" th:action="@{/registration}" class="btn btn-primary" type="submit">Registration</button>
+        <button class="btn btn-primary" type="submit">Registration</button>
 
     </form>
 </div>

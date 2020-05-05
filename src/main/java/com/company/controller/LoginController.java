@@ -7,11 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
 
-   /* @Autowired
-    private UserDAO userRepository;
-    @Autowired
-    private UserService userService;*/
-
     @GetMapping("/history")
     public String history(Model model){
         model.addAttribute("history");
@@ -23,14 +18,4 @@ public class LoginController {
         model.addAttribute("result");
         return "result";
     }
-
-    /*@PostMapping("/history")
-    public String history(ModelMap model, @ModelAttribute User user){
-        if(userService.login(user)){
-            return "result";
-        }else {
-            model.addAttribute("history",user);
-            return "history";
-        }
-    }*/
 }

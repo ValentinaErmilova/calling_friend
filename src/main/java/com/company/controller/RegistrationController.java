@@ -25,7 +25,7 @@ public class RegistrationController {
     @PostMapping("/registration")
     public String registration(@ModelAttribute User user){
         userService.save(user);
-        return "result";
+        return "registrationResult";
     }
 
 }
