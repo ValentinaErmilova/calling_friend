@@ -19,19 +19,19 @@ public class LoginController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/historyCall")
-    public String mainForm(Model model){
-        model.addAttribute("historyCall",new User());
-        return "historyCall";
+    @GetMapping("/history")
+    public String history(Model model){
+        model.addAttribute("history",new User());
+        return "history";
     }
 
-    @PostMapping("/historyCall")
-    public String mainForm(ModelMap model, @ModelAttribute User user){
+    @PostMapping("/history")
+    public String history(ModelMap model, @ModelAttribute User user){
         if(userService.login(user)){
             return "result";
         }else {
-            model.addAttribute("historyCall",user);
-            return "historyCall";
+            model.addAttribute("history",user);
+            return "history";
         }
     }
 }
