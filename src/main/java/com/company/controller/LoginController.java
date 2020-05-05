@@ -1,31 +1,30 @@
 package com.company.controller;
 
-import com.company.model.User;
-import com.company.dao.UserDAO;
-import com.company.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class LoginController {
 
-    @Autowired
+   /* @Autowired
     private UserDAO userRepository;
     @Autowired
-    private UserService userService;
+    private UserService userService;*/
 
     @GetMapping("/history")
     public String history(Model model){
-        model.addAttribute("history",new User());
+        model.addAttribute("history");
         return "history";
     }
 
-    @PostMapping("/history")
+    @GetMapping("/result")
+    public String result(Model model){
+        model.addAttribute("result");
+        return "result";
+    }
+
+    /*@PostMapping("/history")
     public String history(ModelMap model, @ModelAttribute User user){
         if(userService.login(user)){
             return "result";
@@ -33,5 +32,5 @@ public class LoginController {
             model.addAttribute("history",user);
             return "history";
         }
-    }
+    }*/
 }
