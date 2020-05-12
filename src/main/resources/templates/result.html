@@ -1,10 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Calling friend</title>
+
+
+    <script type="text/javascript" src="test.js"></script>
+
+    <script type = "text/javascript"
+             src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
 </head>
 <body>
     <h1>success login</h1>
+
+    <!--<form form th:action="@{/doCall}" method="get">-->
+
+    <h1 th:inline="text">Hello!</h1>
+
+    <button id="button-call">Call</button>
+
+
+
+    <!--Скрипты отдельно! НЕ ЗАБЫТЬ УБРАТЬ-->
+    <script>
+        console.log("hello world")
+
+        $(function() {
+            $.ajax('/rest/token')
+                .done(function(token) {
+                    console.log('Got a token: ', token);
+
+                    Twilio.Device.setup(token);
+
+                    Twilio.Device.ready(function(device) {
+                        console.log('Ready');
+
+
+                        document.getElementById('button-call').onclick = function() {
+                            console.log('Calling...');
+                            Twilio.Device.connect();
+                        };
+                    });
+
+                    Twilio.Device.error(function(error) {
+                        console.log('Error: ' + error.message);
+                    });
+
+                    Twilio.Device.incoming(function(conn) {
+                        console.log('Incoming connection from ' + conn.parameters.From);
+                        // accept the incoming connection and start two-way audio
+                        conn.accept();
+                    });
+
+                })
+                .fail(function() {
+                    alert('Could not authenticate!');
+                });
+        });
+    </script>
+
+
+
+
 </body>
 </html>
