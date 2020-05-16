@@ -5,7 +5,7 @@
     <title>Calling friend</title>
 
 
-    <script type="text/javascript" src="test.js"></script>
+    <!--<script type="text/javascript" src="test.js"></script>-->
 
     <script type = "text/javascript"
              src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
@@ -24,48 +24,120 @@
 
     <!--<form form th:action="@{/doCall}" method="get">-->
 
-    <h1 th:inline="text">Hello!</h1>
+    <form th:object="${result}">
+        <p>Hello <label th:text="*{email}" /></p>
+    </form>
 
+
+    <input id="toInput" type="text">
     <button id="button-call">Call</button>
 
+    <div style="display: none" id = "incomingCall">
+        <p>Incoming call</p>
+        <p>From <label id = "from"></label></p>
+
+        <div id="acceptButtons">
+            <button type="submit" id="acceptCall">accept call</button>
+            <button type="submit" id="rejectCall">reject call</button>
+        </div>
+
+        <button style="display: none" type="submit" id="endCall">end call</button>
+    </div>
 
 
     <!--Скрипты отдельно! НЕ ЗАБЫТЬ УБРАТЬ-->
     <script>
-        console.log("hello world")
+            console.log("hello world")
 
-        $(function() {
-            $.ajax('/rest/token')
-                .done(function(token) {
-                    console.log('Got a token: ', token);
+            $(function() {
+                $.ajax('/rest/token')
+                    .done(function(token) {
+                        let incomingDiv = document.getElementById('incomingCall');
+                        let acceptButtons = document.getElementById('acceptButtons');
+                        let accept = document.getElementById('acceptCall');
+                        let reject = document.getElementById('rejectCall');
+                        let end = document.getElementById('endCall');
 
-                    Twilio.Device.setup(token);
+                        console.log('Got a token: ', token);
 
-                    Twilio.Device.ready(function(device) {
-                        console.log('Ready');
+                        Twilio.Device.setup(token);
+
+                        Twilio.Device.ready(function(device) {
+                            console.log('Ready');
+
+                            document.getElementById('button-call').onclick = function() {
+                                let to = document.getElementById("toInput").value;
+                                console.log('to = '+to);
+                                const params = { To: to};
+
+                                console.log('Calling ' + params.To + '...');
+                                Twilio.Device.connect(params);
+
+                                incomingDiv.style.display = 'block';
+                                acceptButtons.style.display = 'none';
+                                end.style.display = 'block';
+                                end.onclick = function() {
+                                    Twilio.Device.disconnectAll();
 
 
-                        document.getElementById('button-call').onclick = function() {
-                            console.log('Calling...');
-                            Twilio.Device.connect();
-                        };
+                                    //incomingDiv.style.display = 'none';
+                                    //acceptButtons.style.display = 'block';
+                                    //end.style.display = 'none';
+
+                                }
+                            };
+                        });
+
+                        Twilio.Device.error(function(error) {
+                            console.log('Error: ' + error.message);
+                        });
+
+                        Twilio.Device.incoming(function(conn) {
+                            console.log('Incoming connection from ' + conn.parameters.From);
+                            //accept the incoming connection and start two-way audio
+                            //conn.accept();
+                            incomingDiv.style.display = 'block';
+
+
+                            accept.onclick = function() {
+                                conn.accept();
+                                acceptButtons.style.display = 'none';
+                                end.style.display = 'block';
+                            }
+
+                            end.onclick = function() {
+                                console.log("end call")
+                                Twilio.Device.disconnectAll();
+
+
+                                incomingDiv.style.display = 'none';
+                                acceptButtons.style.display = 'block';
+                                end.style.display = 'none';
+
+                            }
+
+                            reject.onclick = function() {
+                                conn.reject();
+                                incomingDiv.style.display = 'none';
+                            }
+
+
+
+                        });
+
+                        Twilio.Device.disconnect(function(){
+                           console.log("!!!call end");
+                           incomingDiv.style.display = 'none';
+                           acceptButtons.style.display = 'block';
+                           end.style.display = 'none';
+                        });
+
+                    })
+                    .fail(function() {
+                        alert('Could not authenticate!');
                     });
+            });
 
-                    Twilio.Device.error(function(error) {
-                        console.log('Error: ' + error.message);
-                    });
-
-                    Twilio.Device.incoming(function(conn) {
-                        console.log('Incoming connection from ' + conn.parameters.From);
-                        // accept the incoming connection and start two-way audio
-                        conn.accept();
-                    });
-
-                })
-                .fail(function() {
-                    alert('Could not authenticate!');
-                });
-        });
     </script>
 
 

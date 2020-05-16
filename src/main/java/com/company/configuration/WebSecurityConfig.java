@@ -1,5 +1,6 @@
 package com.company.configuration;
 
+import com.company.model.User;
 import com.company.service.MyUserDetailsService;
 import com.google.common.collect.ImmutableList;
 import org.springframework.context.annotation.Bean;
