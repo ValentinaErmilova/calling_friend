@@ -5,143 +5,51 @@
     <title>Calling friend</title>
 
 
-    <!--<script type="text/javascript" src="test.js"></script>-->
+    <!--<script type="text/javascript" src="TwilioClient.js"></script>-->
 
     <script type = "text/javascript"
              src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
-
-
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <script type="text/javascript" src="js/src/TwilioClient.js" ></script>
+
 </head>
 <body>
-    <h1>success login</h1>
 
-    <!--<form form th:action="@{/doCall}" method="get">-->
+    <div class="container-fluid">
+        <h1>success login</h1>
 
-    <form th:object="${result}">
-        <p>Hello <label th:text="*{email}" /></p>
-    </form>
+        <form th:object="${result}">
+            <p>Hello <label id="from" th:text="*{phonenumber}"/></p> <!--or use email!-->
+        </form>
 
 
-    <input id="toInput" type="text">
-    <button id="button-call">Call</button>
+        <input placeholder="Enter phone number" id="toInput" type="text">
+        <button onclick="outgoingCall()" id="button-call">Call</button>
 
-    <div style="display: none" id = "incomingCall">
-        <p>Incoming call</p>
-        <p>From <label id = "from"></label></p>
+        <div id = "call">
+            <div style="display: none" id = "incomingCall">
+                <p>Incoming call from: <label id ="fromClient"></label></p>
+                <div id="incomingButtons">
+                    <button class="btn btn-success" type="submit" id="acceptCall">accept call</button>
+                    <button class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
+                </div>
+            </div>
 
-        <div id="acceptButtons">
-            <button type="submit" id="acceptCall">accept call</button>
-            <button type="submit" id="rejectCall">reject call</button>
+            <div style="display: none" id = "outgoingCall">
+                <p>Outgoing call to: <label id ="toClient"></label></p>
+            </div>
+
+            <button class="btn btn-danger" onclick="endCall()" type="submit" style="display: none" id="endCall">end call</button>
         </div>
 
-        <button style="display: none" type="submit" id="endCall">end call</button>
+        <script>
+            getToken();
+        </script>
     </div>
-
-
-    <!--Скрипты отдельно! НЕ ЗАБЫТЬ УБРАТЬ-->
-    <script>
-            console.log("hello world")
-
-            $(function() {
-                $.ajax('/rest/token')
-                    .done(function(token) {
-                        let incomingDiv = document.getElementById('incomingCall');
-                        let acceptButtons = document.getElementById('acceptButtons');
-                        let accept = document.getElementById('acceptCall');
-                        let reject = document.getElementById('rejectCall');
-                        let end = document.getElementById('endCall');
-
-                        console.log('Got a token: ', token);
-
-                        Twilio.Device.setup(token);
-
-                        Twilio.Device.ready(function(device) {
-                            console.log('Ready');
-
-                            document.getElementById('button-call').onclick = function() {
-                                let to = document.getElementById("toInput").value;
-                                console.log('to = '+to);
-                                const params = { To: to};
-
-                                console.log('Calling ' + params.To + '...');
-                                Twilio.Device.connect(params);
-
-                                incomingDiv.style.display = 'block';
-                                acceptButtons.style.display = 'none';
-                                end.style.display = 'block';
-                                end.onclick = function() {
-                                    Twilio.Device.disconnectAll();
-
-
-                                    //incomingDiv.style.display = 'none';
-                                    //acceptButtons.style.display = 'block';
-                                    //end.style.display = 'none';
-
-                                }
-                            };
-                        });
-
-                        Twilio.Device.error(function(error) {
-                            console.log('Error: ' + error.message);
-                        });
-
-                        Twilio.Device.incoming(function(conn) {
-                            console.log('Incoming connection from ' + conn.parameters.From);
-                            //accept the incoming connection and start two-way audio
-                            //conn.accept();
-                            incomingDiv.style.display = 'block';
-
-
-                            accept.onclick = function() {
-                                conn.accept();
-                                acceptButtons.style.display = 'none';
-                                end.style.display = 'block';
-                            }
-
-                            end.onclick = function() {
-                                console.log("end call")
-                                Twilio.Device.disconnectAll();
-
-
-                                incomingDiv.style.display = 'none';
-                                acceptButtons.style.display = 'block';
-                                end.style.display = 'none';
-
-                            }
-
-                            reject.onclick = function() {
-                                conn.reject();
-                                incomingDiv.style.display = 'none';
-                            }
-
-
-
-                        });
-
-                        Twilio.Device.disconnect(function(){
-                           console.log("!!!call end");
-                           incomingDiv.style.display = 'none';
-                           acceptButtons.style.display = 'block';
-                           end.style.display = 'none';
-                        });
-
-                    })
-                    .fail(function() {
-                        alert('Could not authenticate!');
-                    });
-            });
-
-    </script>
-
-
-
-
 </body>
 </html>

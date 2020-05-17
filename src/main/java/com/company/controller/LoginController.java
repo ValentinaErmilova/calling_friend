@@ -15,7 +15,7 @@ public class LoginController {
     @Autowired
     UserDAO userDAO;
 
-    @GetMapping("/history")
+    @GetMapping({"/","/history"})
     public String history(Model model){
         model.addAttribute("history");
         return "history";
@@ -25,7 +25,7 @@ public class LoginController {
     public String result(Model model){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        String username = "";
+        String username;
         if (principal instanceof UserDetails) {
             username = ((UserDetails)principal).getUsername();
         } else {

@@ -1,6 +1,5 @@
 package com.company.configuration;
 
-import com.company.model.User;
 import com.company.service.MyUserDetailsService;
 import com.google.common.collect.ImmutableList;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
 
     @Bean
     PasswordEncoder passwordEncoder(){
@@ -46,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/registration","/history","/rest/*").permitAll()
+                .antMatchers("/","/registration","/history","/rest/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -55,20 +53,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .csrf().disable();
-
     }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(ImmutableList.of("*"));
-        configuration.setAllowedMethods(ImmutableList.of("HEAD",
-                "GET", "POST", "PUT", "DELETE", "PATCH"));
-        // setAllowCredentials(true) is important, otherwise:
-        // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
+        configuration.setAllowedMethods(ImmutableList.of("GET", "POST"));
         configuration.setAllowCredentials(true);
-        // setAllowedHeaders is important! Without it, OPTIONS preflight request
-        // will fail with 403 Invalid CORS request
         configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -76,7 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(final AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
 }
