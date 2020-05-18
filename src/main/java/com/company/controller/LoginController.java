@@ -33,7 +33,6 @@ public class LoginController {
         }
 
         User user = userDAO.findByEmail(username);
-        System.out.println(user);
         model.addAttribute("result",user);
         return "result";
     }
