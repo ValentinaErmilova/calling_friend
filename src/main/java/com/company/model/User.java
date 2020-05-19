@@ -1,5 +1,6 @@
 package com.company.model;
 
+
 import javax.persistence.*;
 
 @Entity
@@ -7,6 +8,7 @@ import javax.persistence.*;
 public class User {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String firstname;
     private String lastname;
