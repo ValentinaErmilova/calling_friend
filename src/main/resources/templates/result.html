@@ -8,7 +8,7 @@
     <!--<script type="text/javascript" src="TwilioClient.js"></script>-->
 
     <script type = "text/javascript"
-             src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
+            src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
@@ -20,36 +20,36 @@
 </head>
 <body>
 
-    <div class="container-fluid">
-        <h1>success login</h1>
+<div class="container-fluid">
+    <h1>success login</h1>
 
-        <form th:object="${result}">
-            <p>Hello <label id="from" th:text="*{phonenumber}"/></p> <!--or use email!-->
-        </form>
+    <form th:object="${result}">
+        <p>Hello <label id="from" th:text="*{phonenumber}"/></p> <!--or use email!-->
+    </form>
 
 
-        <input placeholder="Enter phone number" id="toInput" type="text">
-        <button onclick="outgoingCall()" id="button-call">Call</button>
+    <input placeholder="Enter phone number" id="toInput" type="text">
+    <button onclick="outgoingCall()" id="button-call">Call</button>
 
-        <div id = "call">
-            <div style="display: none" id = "incomingCall">
-                <p>Incoming call from: <label id ="fromClient"></label></p>
-                <div id="incomingButtons">
-                    <button class="btn btn-success" type="submit" id="acceptCall">accept call</button>
-                    <button class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
-                </div>
+    <div id = "call">
+        <div style="display: none" id = "incomingCall">
+            <p>Incoming call from: <label id ="fromClient"></label></p>
+            <div id="incomingButtons">
+                <button class="btn btn-success" type="submit" id="acceptCall">accept call</button>
+                <button class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
             </div>
-
-            <div style="display: none" id = "outgoingCall">
-                <p>Outgoing call to: <label id ="toClient"></label></p>
-            </div>
-
-            <button class="btn btn-danger" onclick="endCall()" type="submit" style="display: none" id="endCall">end call</button>
         </div>
 
-        <script>
-            getToken();
-        </script>
+        <div style="display: none" id = "outgoingCall">
+            <p>Outgoing call to: <label id ="toClient"></label></p>
+        </div>
+
+        <button class="btn btn-danger" onclick="endCall()" type="submit" style="display: none" id="endCall">end call</button>
     </div>
+
+    <script>
+        getToken();
+    </script>
+</div>
 </body>
 </html>
