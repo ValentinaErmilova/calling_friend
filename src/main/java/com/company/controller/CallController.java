@@ -3,12 +3,14 @@ package com.company.controller;
 import com.company.dao.ApplicationSettingDao;
 import com.company.dao.UserDAO;
 import com.company.model.Setting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.twilio.jwt.client.OutgoingClientScope;
 import com.twilio.twiml.TwiMLException;
 import com.twilio.twiml.VoiceResponse;
 import com.twilio.twiml.voice.Dial;
 import com.twilio.twiml.voice.Say;
+import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
 import com.twilio.jwt.client.ClientCapability;
 import com.twilio.jwt.client.IncomingClientScope;
 import com.twilio.jwt.client.Scope;
@@ -34,6 +33,11 @@ public class CallController {
 
     private final static String TOKEN_CONTENT_TYPE = "application/jwt";
     private final static String CAll_CONTENT_TYPE = "application/xml";
+    //request params
+    private final static String FROM = "From";
+    private final static String TO = "To";
+    private final static String CALL_SID = "CallSid";
+
 
     @Autowired
     private UserDAO userDAO;
@@ -81,8 +85,9 @@ public class CallController {
 
     @GetMapping("/doCall")
     public void doCall(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        String from = request.getParameter("From");
-        String to = request.getParameter("To");
+        String from = request.getParameter(FROM);
+        String to = request.getParameter(TO);
+        String callSid = request.getParameter(CALL_SID);
 
         VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
         if (checkNumber(from) && checkNumber(to)) {
@@ -93,23 +98,10 @@ public class CallController {
             Dial dial = dialBuilder.build();
             responseBuilder = responseBuilder.dial(dial);
         }else {
-
-            //also maybe need to add validation on UI side
-            List<String> errors = new ArrayList<>();
-            if(!checkNumber(from)){
-                errors.add("invalid 'from' number");
-            }
-            if(!checkNumber(to)){
-                errors.add("invalid 'to' number");
-            }
-
-            String error = String.join(", ", errors);
+            //also maybe need to add validation on UI side: CF-6 task
+            String error = parseError(callSid,from,to);
             Say say = new Say.Builder(error).build();
             responseBuilder = responseBuilder.say(say);
-
-
-            String callSid = request.getParameter("CallSid");
-            logger.warn("error in call: call sid = "+callSid+" : "+error);
         }
 
         VoiceResponse twiml = responseBuilder.build();
@@ -123,7 +115,22 @@ public class CallController {
         }
     }
 
+    private String parseError(String callSid, String from, String to){
+        List<String> errors = new ArrayList<>();
+        if(!checkNumber(from)){
+            errors.add("invalid 'from' number");
+        }
+        if(!checkNumber(to)){
+            errors.add("invalid 'to' number");
+        }
+        
+        String error = String.join(", ", errors);
+        logger.warn("error in call: call sid = "+callSid+" : "+error);
+
+        return error;
+    }
+
     private boolean checkNumber(String number){
-        return !(number == null || "".equals(number));
+        return !Strings.isNullOrEmpty(number);
     }
 }

@@ -95,6 +95,8 @@ function setDefaultStyle() {
 function outgoingCall() {
     outgoingDiv.style.display = 'block';
     endButton.style.display = 'block';
+
+    //toClient
     toClient.innerHTML = to.value;
     let fromS = from.innerHTML;
     const params = { To: to.value, From: fromS};
