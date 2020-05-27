@@ -1,0 +1,82 @@
+body {
+    background: #f3f3f3;
+}
+
+.header{
+    position: -webkit-sticky;
+    position: sticky;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.column{
+}
+
+.call-status-icon{
+    height: 25px;
+}
+
+.call-element{
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.call-row {
+    border-style: solid;
+    border-color: #ffffff;
+    border-width: 1px;
+    border-radius: 10px;
+    margin: 10px;
+    background-color: #ffffff;
+}
+
+.call-column{
+    position: -webkit-sticky;
+    position: sticky;
+    padding-top: 10px;
+    top: 160px;
+    width: 260px;
+}
+
+.dial-pad-panel{
+    position: -webkit-sticky;
+    position: sticky;
+    padding-top: 10px;
+    top: 160px;
+    background: #ffffff;
+    overflow:hidden;
+    border-radius: 15px;
+    width: 260px;
+}
+
+
+.phone-input {
+    text-align: center;
+    width: 210px;
+}
+
+.dial-pad{
+    margin: 10px;
+}
+
+.dial-button{
+    width: 70px;
+    height: 70px;
+}
+
+.call-column-footer{
+    padding: 10px;
+    background: #e7e7e7;
+}
+
+.call-panel{
+    display: none;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 15px;
+    background: white;
+}
+
+.docall-button{
+    border-radius: 50%;
+}
