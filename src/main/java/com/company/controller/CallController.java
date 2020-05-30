@@ -3,14 +3,14 @@ package com.company.controller;
 import com.company.dao.ApplicationSettingDao;
 import com.company.dao.UserDAO;
 import com.company.model.Setting;
-import com.google.common.base.Strings;
+
+import com.company.utils.CallUtils;
 import com.google.common.collect.Lists;
 import com.twilio.jwt.client.OutgoingClientScope;
 import com.twilio.twiml.TwiMLException;
 import com.twilio.twiml.VoiceResponse;
 import com.twilio.twiml.voice.Dial;
 import com.twilio.twiml.voice.Say;
-import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,6 @@ public class CallController {
 
     private final static String TOKEN_CONTENT_TYPE = "application/jwt";
     private final static String CAll_CONTENT_TYPE = "application/xml";
-    //request params
     private final static String FROM = "From";
     private final static String TO = "To";
     private final static String CALL_SID = "CallSid";
@@ -45,7 +44,7 @@ public class CallController {
     @Autowired
     private ApplicationSettingDao settingDao;
 
-    private static final Logger logger = LoggerFactory.getLogger(CallController.class);;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
 
     private String getCurrentName(){
         String username;
@@ -59,7 +58,7 @@ public class CallController {
 
         username = userDAO.findByEmail(username).getPhonenumber();
 
-        return username;
+        return username.substring(1);
     }
 
     @GetMapping("/token")
@@ -67,6 +66,8 @@ public class CallController {
 
         Setting setting = settingDao.getFirstBy();
         String username = getCurrentName();
+
+        System.out.println(">> "+username);
 
         OutgoingClientScope outgoingScope = new OutgoingClientScope.Builder(setting.getApplicationSid()).build();
         IncomingClientScope incomingScope = new IncomingClientScope(username);
@@ -89,48 +90,29 @@ public class CallController {
         String to = request.getParameter(TO);
         String callSid = request.getParameter(CALL_SID);
 
-        VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
-        if (checkNumber(from) && checkNumber(to)) {
-            Dial.Builder dialBuilder = new Dial.Builder().callerId(from);
-
-            Client client = new Client.Builder(to).build();
-            dialBuilder = dialBuilder.client(client);
-            Dial dial = dialBuilder.build();
-            responseBuilder = responseBuilder.dial(dial);
-        }else {
-            //also maybe need to add validation on UI side: CF-6 task
-            String error = parseError(callSid,from,to);
-            Say say = new Say.Builder(error).build();
-            responseBuilder = responseBuilder.say(say);
-        }
-
-        VoiceResponse twiml = responseBuilder.build();
-
-        response.setContentType(CAll_CONTENT_TYPE);
-
         try {
+            VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
+            if (CallUtils.checkNumber(from) && CallUtils.checkNumber(to)) {
+                Dial.Builder dialBuilder = new Dial.Builder().callerId(from);
+
+                Client client = new Client.Builder(to).build();
+                dialBuilder = dialBuilder.client(client);
+                Dial dial = dialBuilder.build();
+                responseBuilder = responseBuilder.dial(dial);
+            }else {
+                String error = CallUtils.parseError(callSid,from,to);
+                Say say = new Say.Builder(error).build();
+                responseBuilder = responseBuilder.say(say);
+            }
+
+            VoiceResponse twiml = responseBuilder.build();
+
+            response.setContentType(CAll_CONTENT_TYPE);
+
             response.getWriter().print(twiml.toXml());
         } catch (TwiMLException e) {
-            logger.warn("",e);
+            LOGGER.warn("",e);
         }
     }
 
-    private String parseError(String callSid, String from, String to){
-        List<String> errors = new ArrayList<>();
-        if(!checkNumber(from)){
-            errors.add("invalid 'from' number");
-        }
-        if(!checkNumber(to)){
-            errors.add("invalid 'to' number");
-        }
-        
-        String error = String.join(", ", errors);
-        logger.warn("error in call: call sid = "+callSid+" : "+error);
-
-        return error;
-    }
-
-    private boolean checkNumber(String number){
-        return !Strings.isNullOrEmpty(number);
-    }
 }

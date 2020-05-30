@@ -10,20 +10,22 @@ let from;
 let incomingButtons;
 let toClient;
 let fromClient;
+let dialpad;
 
 function loadDOM() {
-    call = document.getElementById('call');
+    call = document.getElementById('callPanel');
     incomingDiv = document.getElementById('incomingCall');
     outgoingDiv = document.getElementById('outgoingCall');
     acceptButton = document.getElementById('acceptCall');
     rejectButton = document.getElementById('rejectCall');
     endButton = document.getElementById('endCall');
-    to = document.getElementById("toInput");
+    to = document.getElementById("inputnumber");
     callButton = document.getElementById("button-call");
     incomingButtons = document.getElementById("incomingButtons");
     from = document.getElementById("from");
     toClient = document.getElementById("toClient");
     fromClient = document.getElementById("fromClient");
+    dialpad = document.getElementById("dial-pad-panel")
 }
 
 function getToken() {
@@ -31,8 +33,6 @@ function getToken() {
     $(function() {
         $.ajax('/rest/token')
             .done(function(token) {
-
-                console.log('Got a token: ', token);
 
                 Twilio.Device.setup(token);
 
@@ -45,11 +45,15 @@ function getToken() {
                 });
 
                 Twilio.Device.incoming(function(conn) {
+                    call.style.display = 'block';
                     let from = conn.parameters.From
                     console.log('Incoming connection from ' + from);
 
                     fromClient.innerHTML = from;
                     incomingDiv.style.display = 'block';
+                    dialpad.style.display = 'none';
+
+                    call.classList.add("call-panel");
 
                     conn.on('cancel', function(conn) {
                         console.log("the call has ended");
@@ -90,18 +94,27 @@ function setDefaultStyle() {
     endButton.style.display = 'none';
     toClient.innerHTML = "";
     fromClient.innerHTML = "";
+    call.style.display = 'none';
+    dialpad.style.display = 'block';
 }
 
 function outgoingCall() {
-    outgoingDiv.style.display = 'block';
-    endButton.style.display = 'block';
+    if(to.value.length == 15) {
+        call.style.display = 'block';
+        outgoingDiv.style.display = 'block';
+        endButton.style.display = 'block';
+        dialpad.style.display = 'none';
 
-    //toClient
-    toClient.innerHTML = to.value;
-    let fromS = from.innerHTML;
-    const params = { To: to.value, From: fromS};
-    console.log(params)
-    Twilio.Device.connect(params);
+        //toClient
+        toClient.innerHTML = to.value;
+        let fromS = from.innerHTML;
+
+        const params = {To: getToo(), From: fromS.substr(1)};
+        Twilio.Device.connect(params);
+    }else {
+        to.classList.add("is-invalid");
+        to.classList.remove("is-valid");
+    }
 }
 
 function endCall() {
