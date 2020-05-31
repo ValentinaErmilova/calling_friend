@@ -1,11 +1,15 @@
 package com.company.controller;
 
 import com.company.dao.ApplicationSettingDao;
+import com.company.dao.CallDAO;
 import com.company.dao.UserDAO;
+import com.company.model.MyCall;
 import com.company.model.Setting;
 
+import com.company.service.CallService;
 import com.company.utils.CallUtils;
 import com.google.common.collect.Lists;
+import com.twilio.http.HttpMethod;
 import com.twilio.jwt.client.OutgoingClientScope;
 import com.twilio.twiml.TwiMLException;
 import com.twilio.twiml.VoiceResponse;
@@ -20,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import com.twilio.jwt.client.ClientCapability;
 import com.twilio.jwt.client.IncomingClientScope;
@@ -44,6 +47,12 @@ public class CallController {
     @Autowired
     private ApplicationSettingDao settingDao;
 
+    @Autowired
+    private CallService callService;
+
+    @Autowired
+    private CallDAO callDAO;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
 
     private String getCurrentName(){
@@ -66,8 +75,6 @@ public class CallController {
 
         Setting setting = settingDao.getFirstBy();
         String username = getCurrentName();
-
-        System.out.println(">> "+username);
 
         OutgoingClientScope outgoingScope = new OutgoingClientScope.Builder(setting.getApplicationSid()).build();
         IncomingClientScope incomingScope = new IncomingClientScope(username);
@@ -93,7 +100,7 @@ public class CallController {
         try {
             VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
             if (CallUtils.checkNumber(from) && CallUtils.checkNumber(to)) {
-                Dial.Builder dialBuilder = new Dial.Builder().callerId(from);
+                Dial.Builder dialBuilder = new Dial.Builder().callerId(from).action("/rest/callEnd").method(HttpMethod.GET);
 
                 Client client = new Client.Builder(to).build();
                 dialBuilder = dialBuilder.client(client);
@@ -115,4 +122,26 @@ public class CallController {
         }
     }
 
+
+    @GetMapping("/callEnd")
+    public void callEnd(HttpServletRequest request, HttpServletResponse response){
+
+        callService.writeCallToDB(request);
+
+        VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
+        VoiceResponse twiml = responseBuilder.build();
+
+        response.setContentType(CAll_CONTENT_TYPE);
+
+        try {
+            response.getWriter().print(twiml.toXml());
+        } catch (IOException e) {
+            LOGGER.warn("",e);
+        }
+    }
+
+    @GetMapping("/getCallsList{phoneNumber}")
+    public List<MyCall> getCallsList(@PathVariable String phoneNumber){
+        return callDAO.getAllCall(phoneNumber);
+    }
 }

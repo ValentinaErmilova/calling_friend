@@ -1,5 +1,6 @@
 package com.company.controller;
 
+import com.company.dao.CallDAO;
 import com.company.dao.UserDAO;
 import com.company.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class LoginController {
 
     @Autowired
     UserDAO userDAO;
+
+    @Autowired
+    CallDAO callDAO;
 
     @GetMapping({"/","/history"})
     public String history(Model model){
@@ -33,6 +37,7 @@ public class LoginController {
         }
 
         User user = userDAO.findByEmail(username);
+
         model.addAttribute("result",user);
         return "result";
     }

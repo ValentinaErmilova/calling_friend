@@ -19,8 +19,6 @@ public class CallUtils {
             errors.add("invalid 'to' number");
         }
 
-        String error = String.join(", ", errors);
-
-        return error;
+        return String.join(", ", errors);
     }
 }

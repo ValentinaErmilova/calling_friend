@@ -62,7 +62,6 @@ function getToken() {
 
                     acceptButton.onclick = function() {
                         let callParam = conn.parameters;
-                        console.log(callParam);
                         acceptCall();
                         console.log("accept call");
                         conn.accept();
@@ -75,7 +74,8 @@ function getToken() {
                     }
                 });
 
-                Twilio.Device.disconnect(function(){
+                Twilio.Device.disconnect(function(connection){
+                    console.log(connection);
                     setDefaultStyle();
                     console.log("disconnect call");
                 });
@@ -98,14 +98,26 @@ function setDefaultStyle() {
     dialpad.style.display = 'block';
 }
 
+function outgoingCallWithNumber(number) {
+
+    call.style.display = 'block';
+    outgoingDiv.style.display = 'block';
+    endButton.style.display = 'block';
+    dialpad.style.display = 'none';
+
+    toClient.innerHTML = number;
+    let fromS = from.innerHTML;
+    const params = {To: number, From: fromS.substr(1)};
+    Twilio.Device.connect(params);
+}
+
 function outgoingCall() {
-    if(to.value.length == 15) {
+    if(to.value.length === 15) {
         call.style.display = 'block';
         outgoingDiv.style.display = 'block';
         endButton.style.display = 'block';
         dialpad.style.display = 'none';
 
-        //toClient
         toClient.innerHTML = to.value;
         let fromS = from.innerHTML;
 
