@@ -1,36 +1,61 @@
-const app = angular.module("myApp", []);
-app.controller("HistoryController", function($scope,$http) {
-    let myPhone = document.getElementById("from").textContent;
+const myApp = angular.module("myApp", [])
+    .service('share', function () {
+        let calls;
+    });
+
+let currentUser;
+myApp.controller("HistoryController", function($scope,$http, share) {
 
     $http({
         method: 'GET',
-        url: '/rest/getCallsList'+myPhone
-    }).then(function successCallback(response) {
-        $scope.calls = response.data;
+        url: '/rest/currentUser'
+    }).then(function success(response) {
+        $scope.user = response.data;
+        currentUser = response.data;
+        getCalls();
+    })
 
-        $scope.styleFunction = function (to, status) {
-            if(status !== 'no-answer') {
-                let incoming = myPhone === to;
+    function getCalls() {
+        $http({
+            method: 'GET',
+            url: '/rest/getCallsList/' + $scope.user.id
+        }).then(function success(response) {
+            $scope.calls = response.data;
+            share.calls = $scope.calls;
 
-                if (incoming) {
-                    return 'incoming';
+            $scope.styleFunction = function (to, status) {
+                if (status === 'no-answer' || status == 'busy') {
+                    return 'no-answer';
                 } else {
-                    return 'outgoing';
+                    let incoming = isInbound(to, $scope.user.id);
+
+                    if (incoming) {
+                        return 'incoming';
+                    } else {
+                        return 'outgoing';
+                    }
                 }
-            }else {
-                return 'no-answer';
             }
-        }
 
-        $scope.callback = function(to, from){
-            if(myPhone === from){
-                outgoingCallWithNumber(to);
-            }else {
-                outgoingCallWithNumber(from);
+            $scope.callback = function (call) {
+                if(isInbound(call.to,$scope.user.id)){
+                    $scope.$broadcast ('callback',  { message: call.fromNumber })
+                }else {
+                    $scope.$broadcast ('callback',  { message: call.toNumber })
+                }
             }
+
+        }, function error(response) {
+
+        });
+
+        function callback(call) {
+
         }
+    }
 
-    }, function errorCallback(response) {
-
-    });
 });
+
+function isInbound(to,from) {
+    return to === from;
+}

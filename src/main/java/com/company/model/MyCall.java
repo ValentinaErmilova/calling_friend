@@ -15,11 +15,17 @@ public class MyCall {
     @Column(name = "call_sid")
     private String callSid;
 
+    @Column(name = "id_from")
+    private int from;
+
+    @Column(name = "id_to")
+    private int to;
+
     @Column(name = "from_number")
-    private String from;
+    private String fromNumber;
 
     @Column(name = "to_number")
-    private String to;
+    private String toNumber;
 
     private String duration;
 
@@ -32,13 +38,15 @@ public class MyCall {
     public MyCall() {
     }
 
-    public MyCall(String callSid, String from, String to, String duration, String status, Timestamp date) {
+    public MyCall(String callSid, int to, int from, String toNumber, String fromNumber, String duration, String status, Timestamp date) {
         this.callSid = callSid;
         this.duration = duration;
         this.status = status;
         this.from = from;
         this.to = to;
         this.date = date;
+        this.toNumber = toNumber;
+        this.fromNumber = fromNumber;
     }
 
     public int getId() {
@@ -57,19 +65,19 @@ public class MyCall {
         this.callSid = callSid;
     }
 
-    public String getFrom() {
+    public int getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
+    public void setFrom(int from) {
         this.from = from;
     }
 
-    public String getTo() {
+    public int getTo() {
         return to;
     }
 
-    public void setTo(String to) {
+    public void setTo(int to) {
         this.to = to;
     }
 
@@ -97,13 +105,32 @@ public class MyCall {
         this.date = date;
     }
 
+    public String getFromNumber() {
+        return fromNumber;
+    }
+
+    public void setFromNumber(String fromNumber) {
+        this.fromNumber = fromNumber;
+    }
+
+    public String getToNumber() {
+        return toNumber;
+    }
+
+    public void setToNumber(String toNumber) {
+        this.toNumber = toNumber;
+    }
+
+
     @Override
     public String toString() {
         return "MyCall{" +
                 "id=" + id +
                 ", callSid='" + callSid + '\'' +
-                ", from='" + from + '\'' +
-                ", to='" + to + '\'' +
+                ", from=" + from +
+                ", to=" + to +
+                ", fromNumber='" + fromNumber + '\'' +
+                ", toNumber='" + toNumber + '\'' +
                 ", duration='" + duration + '\'' +
                 ", status='" + status + '\'' +
                 ", date=" + date +

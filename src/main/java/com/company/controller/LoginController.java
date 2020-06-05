@@ -27,18 +27,9 @@ public class LoginController {
 
     @GetMapping("/result")
     public String result(Model model){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        User user = userDAO.findByEmail(username);
-
-        model.addAttribute("result",user);
+        model.addAttribute("result");
         return "result";
     }
+
+
 }

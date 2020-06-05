@@ -2,16 +2,23 @@ package com.company.service;
 
 import com.company.dao.ApplicationSettingDao;
 import com.company.dao.CallDAO;
+import com.company.dao.UserDAO;
 import com.company.model.MyCall;
 import com.company.model.Setting;
+import com.company.model.User;
 import com.twilio.Twilio;
+import com.twilio.base.ResourceSet;
 import com.twilio.rest.api.v2010.account.Call;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
+import java.util.Map;
+
+import static com.company.controller.CallController.*;
 
 @Service
 public class CallService {
@@ -20,30 +27,83 @@ public class CallService {
     private CallDAO callDAO;
 
     @Autowired
+    private UserDAO userDAO;
+
+    @Autowired
     private ApplicationSettingDao settingDao;
 
-    private final static String DIAL_CALL_SID = "DialCallSid";
+    private final static String INBOUND = "INCOMING";
+    private final static String OUTBOUND = "OUTGOING";
+    private final static String DIRECTION = "Direction";
 
-    public void writeCallToDB(HttpServletRequest request){
+    public User getCurrentUser(){
+        String username;
 
-        new Thread(() -> {
-            String callSid = request.getParameter(DIAL_CALL_SID);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails)principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
 
-            Setting setting = settingDao.getFirstBy();
+        return userDAO.findByEmail(username);
+    }
 
-            Twilio.init(setting.getAccountSid(), setting.getAuthToken());
+    public MyCall saveCall(Map<String, String> data){
+        Setting setting = settingDao.getFirstBy();
+        Twilio.init(setting.getAccountSid(), setting.getAuthToken());
 
-            Call call = Call.fetcher(callSid).fetch();
-            String callTo = call.getTo();
 
-            String to = "+" + callTo.substring(callTo.indexOf(":") + 1);
 
-            DateTime startTime = call.getStartTime();
-            Timestamp ts = new Timestamp(startTime.getMillis());
+        String callSid;
+        boolean closedBeforeBeeps = false;
 
-            MyCall myCall = new MyCall(callSid, call.getFrom(), to,call.getDuration(), call.getStatus().toString(), ts);
+        boolean outbound = data.get(DIRECTION).equals(OUTBOUND);
+        if(outbound) {
+            ResourceSet<Call> calls = Call.reader().setParentCallSid(data.get(CALL_SID)).read();
 
+            if(calls.iterator().hasNext()){
+                Call childCall = calls.iterator().next();
+                callSid = childCall.getSid();
+
+            }else {
+                closedBeforeBeeps = true;
+                callSid = data.get(CALL_SID);
+            }
+
+        }else {
+            callSid = data.get(CALL_SID);
+        }
+
+        Call call = Call.fetcher(callSid).fetch();
+
+        String to = data.get(TO);
+        String from = data.get(FROM);
+
+        int toUser = userDAO.findIdByPhoneNumber(to);
+        int fromUser = userDAO.findIdByPhoneNumber(from);
+
+        DateTime startTime = call.getStartTime();
+        Timestamp date = new Timestamp(startTime.getMillis());
+
+        MyCall myCall = new MyCall(
+                callSid,
+                toUser,
+                fromUser,
+                to,
+                from,
+                call.getDuration(),
+                call.getStatus().toString(),
+                date);
+
+        if(outbound && !closedBeforeBeeps) {
             callDAO.save(myCall);
-        }).start();
+        }
+
+        if(!closedBeforeBeeps) {
+            return myCall;
+        }else {
+            return null;
+        }
     }
 }

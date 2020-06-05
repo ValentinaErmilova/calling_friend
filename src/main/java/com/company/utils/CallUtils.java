@@ -10,7 +10,7 @@ public class CallUtils {
         return !Strings.isNullOrEmpty(number);
     }
 
-    public static String parseError(String callSid, String from, String to){
+    public static String parseError(String from, String to){
         List<String> errors = new ArrayList<>();
         if(!checkNumber(from)){
             errors.add("invalid 'from' number");

@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Calling friend</title>
@@ -14,9 +13,10 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
 
-    <script type="text/javascript" src="js/src/TwilioClient.js" ></script>
-    <script type="text/javascript" src="js/src/UIScripts.js" ></script>
     <script type="text/javascript" src="js/src/HistoryController.js" ></script>
+    <script type="text/javascript" src="js/src/CallController.js" ></script>
+
+
 
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -26,9 +26,9 @@
 <body ng-app="myApp" ng-controller="HistoryController">
 
 <div class="col-12 sticky-top header">
-    <form th:object="${result}">
-        <h3>Hello <label th:text="*{firstname}"/>!</h3>
-        <h4>your phone is <label id="from" th:text="*{phonenumber}"/></h4>
+    <form>
+        <h3>Hello {{user.firstname}}!</h3>
+        <h6>your phone is {{user.phonenumber}}</h6>
     </form>
 </div>
 
@@ -40,35 +40,36 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-8 col-lg-6" ng-controller="HistoryController">
-
+        <div class="col-12 col-md-8 col-lg-6" >
             <div id="calls" class="column">
                 <h2>calls history</h2>
 
                 <div class="call-row" ng-repeat="call in calls">
-                    <h5>from: {{call.from}}</h5>
+                    <h5>from: {{call.fromNumber}}</h5>
 
                     <div class="calls-row">
                         <div class="Column" ng-class="[styleFunction(call.to, call.status)]"></div>
-                        <div class="calls-column"><h6>to: {{call.to}}</h6></div>
+                        <div class="calls-column"><h6>to: {{call.toNumber}}</h6></div>
                         <div class="calls-column"><h6>date: {{call.date}}</h6></div>
                         <div class="calls-column"><h6>duration: {{call.duration * 1000 | date: 'mm:ss': 'UTC'}}</h6></div>
-                        <button ng-click="callback(call.to, call.from)" class="callback btn btn-outline-light"></button>
+                        <button ng-click="callback(call)" class="callback btn btn-outline-light"></button>
                     </div>
 
                 </div>
             </div>
         </div>
 
-        <div class="d-none d-md-block col-md-4 col-lg-3">
+        <div class="d-none d-md-block col-md-4 col-lg-3" ng-controller="CallController">
             <div id = "callColumn" class="column call-column">
 
-
-                <div id = "dial-pad-panel" class="dial-pad-panel">
+                <div id = "dial-pad-panel" class="dial-pad-panel" ng-show="TWconnected">
 
                     <form>
-                        <input class="form-control phone-input" maxlength="15" id="inputnumber" type="text"
-                               placeholder="+1 123 456 7890" onfocusout="numberInputUnfocus()" oninput="this.value = numberInputFormat()"/>
+
+                        <input ng-model="toNumber" ng-change="change()" ng-blur="unfocus()" class="form-control phone-input"
+                               ng-class="{'is-valid': valid, 'is-invalid': invalid}"
+                               maxlength="15" id="inputnumber" type="text"
+                               placeholder="+1 123 456 7890">
 
                         <div class="invalid-feedback">
                             The number is not fully entered
@@ -81,19 +82,19 @@
                         <tbody>
 
                         <tr>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">1</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">2</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">3</button></td>
+                            <td><button ng-click="pressNumber(1)" class="btn btn-outline-primary dial-button">1</button></td>
+                            <td><button ng-click="pressNumber(2)" class="btn btn-outline-primary dial-button">2</button></td>
+                            <td><button ng-click="pressNumber(3)" class="btn btn-outline-primary dial-button">3</button></td>
                         </tr>
                         <tr>
-                            <td><button onclick="handleClick(event)"class="btn btn-outline-primary dial-button">4</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">5</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">6</button></td>
+                            <td><button ng-click="pressNumber(4)" class="btn btn-outline-primary dial-button">4</button></td>
+                            <td><button ng-click="pressNumber(5)" class="btn btn-outline-primary dial-button">5</button></td>
+                            <td><button ng-click="pressNumber(6)" class="btn btn-outline-primary dial-button">6</button></td>
                         </tr>
                         <tr>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">7</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">8</button></td>
-                            <td><button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">9</button></td>
+                            <td><button ng-click="pressNumber(7)" class="btn btn-outline-primary dial-button">7</button></td>
+                            <td><button ng-click="pressNumber(8)" class="btn btn-outline-primary dial-button">8</button></td>
+                            <td><button ng-click="pressNumber(9)" class="btn btn-outline-primary dial-button">9</button></td>
                         </tr>
 
                         <tr>
@@ -101,10 +102,10 @@
 
                             </td>
                             <td>
-                                <button onclick="handleClick(event)" class="btn btn-outline-primary dial-button">0</button>
+                                <button ng-click="pressNumber(0)" class="btn btn-outline-primary dial-button">0</button>
                             </td>
                             <td>
-                                <svg onclick="deleteLast()" class="bi bi-backspace btn btn-outline-primary dial-button" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <svg ng-click="deleteLast()" class="bi bi-backspace btn btn-outline-primary dial-button" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
                                     <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
                                     <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
@@ -116,28 +117,28 @@
                     </table>
 
                     <div class="myCall-column-footer">
-                        <!--<svg onclick="outgoingCall()" class="bi bi-arrow-up-right-circle-fill btn-outline-success docall-button" width="4em" height="4em" viewBox="0 0 16 16" fill="green" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.5 5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6.707l-4.146 4.147a.5.5 0 0 1-.708-.708L9.293 6H6.5a.5.5 0 0 1 0-1z"/>
-                        </svg>-->
-                        <button onclick="outgoingCall()" class="docall-button btn btn-outline-light"></button>
+                        <button ng-click="outgoingCall()" class="docall-button btn btn-outline-light"></button>
                     </div>
 
                 </div>
 
-                <div id="callPanel" class="call-panel">
-                    <div style="display: none" id = "incomingCall">
-                        <p>Incoming call from: <label id ="fromClient"></label></p>
-                        <div id="incomingButtons">
-                            <button class="btn btn-success" type="submit" id="acceptCall">accept call</button>
-                            <button class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
+                <div id="callPanel" class="call-panel" ng-show="ActiveCall">
+
+                    <div id = "incomingCall" ng-show="ActiveInbound">
+                        <h4>Incoming call from: </h4>
+                        <h4>{{from}}</h4>
+                        <div id="incomingButtons" ng-show="InboundOption">
+                            <button ng-click="accept()" class="btn btn-success" type="submit" id="acceptCall">accept call</button>
+                            <button ng-click="reject()" class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
                         </div>
                     </div>
 
-                    <div style="display: none" id = "outgoingCall">
-                        <p>Outgoing call to: <label id ="toClient"></label></p>
+                    <div id = "outgoingCall" ng-show="ActiveOutbound">
+                        <p>Outgoing call to:</p>
+                        <p>{{to}}</p>
                     </div>
 
-                    <button class="btn btn-danger" onclick="endCall()" type="submit" style="display: none" id="endCall">end call</button>
+                    <button class="btn btn-danger" ng-click="endCall()" type="submit" ng-show="EndActive" id="endCall()">end call</button>
                 </div>
             </div>
 
@@ -145,9 +146,7 @@
     </div>
 </div>
 
-<script>
-    getToken();
-</script>
+
 
 </body>
 </html>

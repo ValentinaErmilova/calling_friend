@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface CallDAO extends JpaRepository<MyCall, Integer> {
 
-    @Query(value = "select * from calls where from_number = :number or to_number = :number order by id desc",nativeQuery = true)
-    List<MyCall> getAllCall(@Param("number") String number);
+    @Query(value = "select * from calls where id_to = :id or id_from = :id order by id desc",nativeQuery = true)
+    List<MyCall> findCallsById(@Param("id") int id);
 }
