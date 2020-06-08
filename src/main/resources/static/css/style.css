@@ -70,7 +70,6 @@ body {
 }
 
 .call-panel{
-    display: none;
     margin-top: 20px;
     padding: 10px;
     border-radius: 15px;
@@ -78,5 +77,71 @@ body {
 }
 
 .docall-button{
+    margin: 5px;
+    width: 5em;
+    height: 5em;
+    background-image: url("../icons/phone-24px.svg");
+    background-size: 5em;
+    alignment: center;
     border-radius: 50%;
+    border-width: 0px;
+    background-color: white;
+}
+
+
+
+
+.calls-row{
+    border-radius: 10px;
+    margin: 10px;
+    padding: 5px;
+}
+
+.calls-row {
+    display: table;
+    border-spacing: 10px;
+}
+.calls-column {
+    display: table-cell;
+}
+
+.incoming{
+    width: 2em;
+    height: 2em;
+    background-image: url(../icons/incoming.svg);
+    background-size: 2em;
+    border-radius: 50%;
+    alignment: center;
+
+}
+
+
+.outgoing{
+    width: 2em;
+    height: 2em;
+    background-image: url(../icons/outgoing.svg);
+    background-size: 2em;
+    border-radius: 50%;
+    alignment: center;
+}
+
+
+.no-answer{
+    width: 2em;
+    height: 2em;
+    background-image: url(../icons/no-answer.svg);
+    background-size: 2em;
+    border-radius: 50%;
+    alignment: center;
+}
+
+.callback{
+    width: 3em;
+    height: 3em;
+    background-image: url("../icons/phone-24px.svg");
+    background-size: 3em;
+    alignment: center;
+    border-radius: 50%;
+    border-width: 0px;
+    background-color: white;
 }

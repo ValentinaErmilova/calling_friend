@@ -1,5 +1,6 @@
 package com.company.controller;
 
+import com.company.dao.CallDAO;
 import com.company.dao.UserDAO;
 import com.company.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class LoginController {
     @Autowired
     UserDAO userDAO;
 
+    @Autowired
+    CallDAO callDAO;
+
     @GetMapping({"/","/history"})
     public String history(Model model){
         model.addAttribute("history");
@@ -23,17 +27,9 @@ public class LoginController {
 
     @GetMapping("/result")
     public String result(Model model){
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        User user = userDAO.findByEmail(username);
-        model.addAttribute("result",user);
+        model.addAttribute("result");
         return "result";
     }
+
+
 }
