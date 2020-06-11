@@ -1,6 +1,8 @@
 package com.company.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -15,6 +17,8 @@ public class User {
     private int age;
     private String phonenumber;
     private String email;
+
+    @JsonIgnore
     private String password;
 
     public User(int id, String firstname, String lastname, int age, String phonenumber, String email, String password) {

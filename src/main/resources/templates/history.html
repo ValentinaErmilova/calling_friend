@@ -1,56 +1,145 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
-
 <head>
+    <meta charset="UTF-8">
     <title>Calling friend</title>
+
+    <script type = "text/javascript"
+            src ="//media.twiliocdn.com/sdk/js/client/v1.7/twilio.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular-route.js"></script>
 
+
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+    <script type="text/javascript" src="js/src/MainCtrl.js" ></script>
+    <script type="text/javascript" src="js/src/HistoryController.js" ></script>
+    <script type="text/javascript" src="js/src/CallController.js" ></script>
+    <script type="text/javascript" src="js/src/FriendController.js" ></script>
+    <script type="text/javascript" src="js/src/UIScript.js" ></script>
+
+    <!--<base href = "/">-->
 </head>
 
-<body>
+<body ng-app="myApp" ng-controller="MainCtrl">
 
-<div class="container-fluid" align="center">
+    <nav class="navbar mx-auto navbar-expand-lg navbar-dark bg-primary sticky-top header">
+        <ul class="mx-auto order-0">
+            <form>
+                <h2>Hello {{user.firstname}}!</h2>
+                <h6>your phone is {{user.phonenumber}}</h6>
+            </form>
 
-    <div th:if="${param.error}" >
-        Invalid username and password.
-    </div>
-    <div th:if="${param.logout}">
-        You have been logged out.
-    </div>
+            <a class="navbar-brand" href="#!calls">Calls history</a>
+            <a class="navbar-brand" href="#!friends">Friends</a>
 
-    <h1><i>Calling friend</i></h1>
-    <h2>Sign in</h2>
+        </ul>
+    </nav>
 
-    <form th:action="@{/history}" method="post">
+    <div id = "mainDiv" class="container-fluid" align="center">
+        <div id="mainDivRow" class="row">
 
-        <div class="form-col">
-
-            <div class="col-md-4 mb-3">
-                <label>Login</label>
-                <input class="form-control" type="email"  placeholder="Enter login" required name="username"/>
+            <div class="col-0 col-md-0 col-lg-3">
+                <div class="column">
+                </div>
             </div>
 
-            <div class="col-md-4 mb-3">
-                <label>Password</label>
-                <input class="form-control" type="password"  placeholder="Enter password" required name="password"/>
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="ng-view"></div>
             </div>
 
-            <div class="col-md-4 mb-3">
-                <button class="btn btn-primary" type="submit">Login</button>
+            <!--<div class="d-none d-md-block col-md-4 col-lg-3">-->
+            <div class="d-none d-md-block col-md-4 col-lg-3" ng-controller="CallController">
+                <div id = "callColumn" class="column call-column">
+
+                    <div id = "dial-pad-panel" class="dial-pad-panel" ng-show="TWconnected">
+
+                        <form>
+
+                            <input ng-model="toNumber" ng-change="change()" ng-blur="unfocus()" class="form-control phone-input"
+                                   ng-class="{'is-valid': valid, 'is-invalid': invalid}"
+                                   maxlength="15" type="text"
+                                   placeholder="+1 123 456 7890">
+
+                            <div class="invalid-feedback">
+                                {{invalidMessage}}
+                            </div>
+
+                        </form>
+
+                        <table align="center" class="dial-pad">
+
+                            <tbody>
+
+                            <tr>
+                                <td><button ng-click="pressNumber(1)" class="btn btn-outline-primary dial-button">1</button></td>
+                                <td><button ng-click="pressNumber(2)" class="btn btn-outline-primary dial-button">2</button></td>
+                                <td><button ng-click="pressNumber(3)" class="btn btn-outline-primary dial-button">3</button></td>
+                            </tr>
+                            <tr>
+                                <td><button ng-click="pressNumber(4)" class="btn btn-outline-primary dial-button">4</button></td>
+                                <td><button ng-click="pressNumber(5)" class="btn btn-outline-primary dial-button">5</button></td>
+                                <td><button ng-click="pressNumber(6)" class="btn btn-outline-primary dial-button">6</button></td>
+                            </tr>
+                            <tr>
+                                <td><button ng-click="pressNumber(7)" class="btn btn-outline-primary dial-button">7</button></td>
+                                <td><button ng-click="pressNumber(8)" class="btn btn-outline-primary dial-button">8</button></td>
+                                <td><button ng-click="pressNumber(9)" class="btn btn-outline-primary dial-button">9</button></td>
+                            </tr>
+
+                            <tr>
+                                <td>
+
+                                </td>
+                                <td>
+                                    <button ng-click="pressNumber(0)" class="btn btn-outline-primary dial-button">0</button>
+                                </td>
+                                <td>
+                                    <svg ng-click="deleteLast()" class="bi bi-backspace btn btn-outline-primary dial-button" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                        <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                        <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                    </svg>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="myCall-column-footer">
+                            <button ng-click="outgoingCall()" class="docall-button btn btn-outline-light"></button>
+                        </div>
+
+                    </div>
+
+                    <div id="callPanel" class="call-panel" ng-show="ActiveCall">
+
+                        <div id = "incomingCall" ng-show="ActiveInbound">
+                            <h4>Incoming call from: </h4>
+                            <h4>{{from}}</h4>
+                            <div id="incomingButtons" ng-show="InboundOption">
+                                <button ng-click="accept()" class="btn btn-success" type="submit" id="acceptCall">accept call</button>
+                                <button ng-click="reject()" class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
+                            </div>
+                        </div>
+
+                        <div id = "outgoingCall" ng-show="ActiveOutbound">
+                            <p>Outgoing call to:</p>
+                            <p>{{to}}</p>
+                        </div>
+
+                        <button class="btn btn-danger" ng-click="endCall()" type="submit" ng-show="EndActive" id="endCall()">end call</button>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </form>
-
-    <form th:action="@{/registration}">
-        <div class="col-md-4 mb-3">
-            <button class="btn btn-primary">Registration</button>
         </div>
-    </form>
 
-</div>
 </body>
 </html>

@@ -1,15 +1,13 @@
-myApp.controller("CallController", function($scope, $http, share) {
+myApp.controller("CallController", function($scope, $rootScope, $http) {
 
     let NeedSetDefault = true;
-
     $scope.toNumber = '';
 
     $scope.outgoingCall = function(){
-
         let to = $scope.toNumber;
-        let from = currentUser.phonenumber;
+        let from = $scope.user.phonenumber;
 
-        if($scope.valid){
+        if($scope.valid && $scope.ActiveCall !== true){
             $scope.TWconnected = false;
             $scope.ActiveCall = true;
             $scope.ActiveOutbound = true;
@@ -18,14 +16,19 @@ myApp.controller("CallController", function($scope, $http, share) {
 
             const params = {To: spaceDelete(to), From: spaceDelete(from)};
             Twilio.Device.connect(params);
+            $scope.toNumber = '';
+            $scope.valid = false;
+            $scope.invalid = false;
         }else {
-            validation(to, true);
+            $scope.toNumber = '';
+            $scope.valid = false;
+            $scope.invalid = false;
         }
 
     }
 
-    $scope.$on('callback', function (event, args) {
-        let phoneNumber = numberInputFormat(args.message);
+    $rootScope.$on('callback', function (event, number) {
+        let phoneNumber = numberInput(number);
         $scope.toNumber = phoneNumber;
         $scope.outgoingCall();
     })
@@ -34,7 +37,7 @@ myApp.controller("CallController", function($scope, $http, share) {
         method: 'GET',
         url: '/rest/token'
     }).then(function success(response) {
-        Twilio.Device.setup(response.data);
+        Twilio.Device.setup(response.data,{allowIncomingWhileBusy : false});
 
         Twilio.Device.ready(function() {
             $scope.$apply(function(){
@@ -47,25 +50,29 @@ myApp.controller("CallController", function($scope, $http, share) {
         });
 
         Twilio.Device.incoming(function(conn) {
-            $scope.connection = conn;
+            if($scope.ActiveCall !== true) {
+                $scope.connection = conn;
 
-            let from = numberInputFormat(conn.parameters.From);
+                let from = inputFormat(conn.parameters.From);
 
-            $scope.from = from;
+                $scope.from = from;
 
-            $scope.$apply(function(){
-                $scope.TWconnected = false;
-                $scope.ActiveCall = true;
-                $scope.ActiveInbound = true;
-                $scope.InboundOption = true;
-            });
-
-            conn.on('cancel', function() {
-                $scope.$apply(function() {
-                    $scope.setDefault();
-                    $scope.reject();
+                $scope.$apply(function () {
+                    $scope.TWconnected = false;
+                    $scope.ActiveCall = true;
+                    $scope.ActiveInbound = true;
+                    $scope.InboundOption = true;
                 });
-            });
+
+                conn.on('cancel', function () {
+                    $scope.$apply(function () {
+                        $scope.setDefault();
+                        DisconnectCall(conn);
+                    });
+                });
+            }else {
+                conn.reject();
+            }
 
         });
 
@@ -76,7 +83,8 @@ myApp.controller("CallController", function($scope, $http, share) {
                 });
             }
 
-            DisconnectCall(conn);
+            setTimeout(() => {  DisconnectCall(conn); }, 2000);
+
         });
 
     }, function error(response) {
@@ -97,9 +105,7 @@ myApp.controller("CallController", function($scope, $http, share) {
 
     $scope.endCall = function () {
         NeedSetDefault = false;
-
         Twilio.Device.disconnectAll();
-
         $scope.setDefault();
     }
 
@@ -114,17 +120,18 @@ myApp.controller("CallController", function($scope, $http, share) {
     }
 
     $scope.pressNumber = function(added) {
+
         if($scope.toNumber.length < 15) {
-            $scope.toNumber = numberInputFormat($scope.toNumber + added);
+            $scope.toNumber = numberInput($scope.toNumber + added)
         }
     }
 
     $scope.change = function () {
-        $scope.toNumber = numberInputFormat($scope.toNumber);
+        $scope.toNumber = numberInput(spaceDelete($scope.toNumber));
     }
 
     $scope.unfocus = function () {
-        validation($scope.toNumber);
+        numberInput($scope.toNumber);
     };
 
     $scope.deleteLast = function () {
@@ -136,7 +143,16 @@ myApp.controller("CallController", function($scope, $http, share) {
 
         number = number.substr(0,number.length-1);
 
-       $scope.toNumber = numberInputFormat(number)
+        $scope.toNumber = numberInput(number)
+    }
+
+    function numberInput(phoneNumber) {
+        phoneNumber = inputFormat(phoneNumber);
+        let checkResult = validation(phoneNumber,$scope.user.phonenumber);
+
+        setNumberStyle($scope, checkResult, callsPage);
+
+        return phoneNumber;
     }
 
     function DisconnectCall(conn) {
@@ -153,70 +169,23 @@ myApp.controller("CallController", function($scope, $http, share) {
             from = '+' + conn.message.From;
         }
 
-        let data = {
-            Direction : direction,
-            CallSid : conn.parameters.CallSid,
-            To : to,
-            From : from,
+        let call = {
+            callSid : conn.parameters.CallSid,
+            toNumber : to,
+            fromNumber : from,
         }
 
 
         $http({
             method: 'POST',
-            url: '/rest/save',
-            data: data
+            url: '/rest/save/'+direction,
+            data: call
         }).then( function success(response) {
             if(response.data !== '') {
-                share.calls.unshift(response.data);
+                $rootScope.calls.unshift(response.data);
+            }else {
             }
+
         });
     }
-
-    function validation(phoneNumber, callPress) {
-
-        phoneNumber = spaceDelete(phoneNumber);
-        if(phoneNumber.length === 11){
-            $scope.valid = true;
-            $scope.invalid = false;
-        }else {
-            if(phoneNumber.length === 0){
-                if(callPress){
-                    $scope.invalid = true;
-                    $scope.valid = false;
-                }else {
-                    $scope.invalid = false;
-                    $scope.valid = false;
-                }
-            }else {
-                $scope.invalid = true;
-                $scope.valid = false;
-            }
-        }
-
-    }
-
-    function numberInputFormat(phoneNumber) {
-        if(phoneNumber.length < 15) {
-            phoneNumber = spaceDelete(phoneNumber);
-            const formatted = phoneNumber.replace(/(\d{0,1})?(\d{1,2})(\d{1})?(\d{1,3})?(\d{1,4})?/, function (_, p1, p2, p3, p4, p5) {
-                let output = "+"
-                if (p1) output += `${p1} `;
-                if (p2) output += `${p2}`;
-                if (p3) output += `${p3}`;
-                if (p4) output += ` ${p4}`
-                if (p5) output += ` ${p5}`
-                return output;
-            });
-            validation(phoneNumber, false);
-            return formatted;
-        }else {
-            validation(phoneNumber, false);
-            return phoneNumber;
-        }
-    }
-
-    function spaceDelete(phoneNumber) {
-        return phoneNumber.replace(/\D/g, "");
-    }
 });
-

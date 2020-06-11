@@ -1,0 +1,21 @@
+<div class="column">
+    <h1 class="call-row row-heading">Calls history</h1>
+    {{message}}
+
+    <div class="call-row" ng-repeat="call in calls track by $index">
+        <h5>from: {{call.fromNumber}}</h5>
+
+        <div class="row mytable-row">
+            <div class="mytable-column" >
+                <button class="btn" ng-class="[styleFunction(call)]"></button>
+            </div>
+            <div class="mytable-column"><h6>to: {{call.toNumber}}</h6></div>
+            <div class="mytable-column"><h6>date: {{call.date}}</h6></div>
+            <div class="mytable-column"><h6>duration: {{call.duration * 1000 | date: 'mm:ss': 'UTC'}}</h6></div>
+            <div class="mytable-column">
+                <button class="callback btn btn-outline-light" ng-click="callback(call)" ></button>
+            </div>
+        </div>
+
+    </div>
+</div>
