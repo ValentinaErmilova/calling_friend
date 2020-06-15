@@ -1,0 +1,61 @@
+<div class="column">
+
+    <div class="call-row row-heading">
+        <h1>Friends list</h1>
+        <button ng-click="showAddPanel()" class="friendButton friendAdd btn btn-outline-light"></button>
+
+        <div class="add-friend-panel" ng-show="addF">
+
+            <button ng-click="addClose()" class="btn btn-outline-light close"></button>
+
+            <div class="row mytable-row">
+                <div class="mytable-column">
+                    <h2>Add friend</h2>
+                    <h6>Search by phone number</h6>
+                </div>
+            </div>
+
+            <div class="row mytable-row">
+                <div class="mytable-column" style="width: 210px">
+                    <input ng-model="friendNumber" ng-change="change()" ng-blur="unfocus()" class="form-control phone-input"
+                           ng-class="{'is-valid': valid, 'is-invalid': invalid}"
+                           maxlength="15" type="text"
+                           placeholder="+1 123 456 7890">
+
+                    <div class="invalid-feedback">
+                        {{invalidMessage}}
+                    </div>
+                </div>
+
+
+                <div class="mytable-column mytable-button">
+                    <button type = "button" class="btn btn-success " ng-click="addFriend()">Add friend</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-repeat="friend in friends track by $index">
+
+        <div class="call-row">
+        <div class="mytable-row">
+            <div class="mytable-column"><h4>{{friend.firstname}}</h4></div>
+            <div class="mytable-column"><h4>{{friend.lastname}}</h4></div>
+            <div class="mytable-column">
+                <button class="friendButton friendDelete btn btn-outline-light" ng-click="deleteFriend(friend)"></button>
+            </div>
+            <div class="mytable-column">
+                <button class="callback btn btn-outline-light" ng-click="callback(friend)"></button>
+            </div>
+
+        </div>
+
+        <div>
+            <div class="mytable-column"><h4>{{friend.phonenumber}}</h4></div>
+        </div>
+        </div>
+
+
+    </div>
+
+</div>

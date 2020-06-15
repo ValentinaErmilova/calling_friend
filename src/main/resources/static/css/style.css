@@ -1,12 +1,12 @@
 body {
-    background: #f3f3f3;
+    background: #ececec;
 }
 
 .header{
     position: -webkit-sticky;
     position: sticky;
-    background-color: #ffffff;
     text-align: center;
+    padding: 10px;
 }
 
 .column{
@@ -23,18 +23,30 @@ body {
 
 .call-row {
     border-style: solid;
-    border-color: #ffffff;
-    border-width: 1px;
+    border-width: 0px;
     border-radius: 10px;
     margin: 10px;
     background-color: #ffffff;
+    padding: 10px;
+}
+
+.add-friend-panel{
+    padding-top: 10px;
+    font-style: normal;
+    border-radius: 0px;
+    border-top: 1px solid black;
+    border-width: 1px
+}
+
+.row-heading{
+    font-style: italic;
 }
 
 .call-column{
     position: -webkit-sticky;
     position: sticky;
     padding-top: 10px;
-    top: 160px;
+    top: 150px;
     width: 260px;
 }
 
@@ -42,13 +54,11 @@ body {
     position: -webkit-sticky;
     position: sticky;
     padding-top: 10px;
-    top: 160px;
     background: #ffffff;
     overflow:hidden;
     border-radius: 15px;
     width: 260px;
 }
-
 
 .phone-input {
     text-align: center;
@@ -64,13 +74,17 @@ body {
     height: 70px;
 }
 
+.btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .call-column-footer{
     padding: 10px;
     background: #e7e7e7;
 }
 
 .call-panel{
-    margin-top: 20px;
     padding: 10px;
     border-radius: 15px;
     background: white;
@@ -88,51 +102,66 @@ body {
     background-color: white;
 }
 
-
-
-
-.calls-row{
+.mytable-row {
     border-radius: 10px;
     margin: 10px;
     padding: 5px;
-}
-
-.calls-row {
     display: table;
     border-spacing: 10px;
+
 }
-.calls-column {
+
+.mytable-button{
+    vertical-align: top;
+}
+
+.mytable-column {
+    align-content: center;
     display: table-cell;
+    margin: 10px;
+    text-align: center;
 }
 
 .incoming{
-    width: 2em;
-    height: 2em;
+    width: 3em;
+    height: 3em;
     background-image: url(../icons/incoming.svg);
-    background-size: 2em;
+    background-size: 3em;
     border-radius: 50%;
-    alignment: center;
-
+    border-width: 0px;
 }
-
 
 .outgoing{
-    width: 2em;
-    height: 2em;
+    width: 3em;
+    height: 3em;
     background-image: url(../icons/outgoing.svg);
-    background-size: 2em;
+    background-size: 3em;
     border-radius: 50%;
-    alignment: center;
+    border-width: 0px;
 }
 
-
 .no-answer{
-    width: 2em;
-    height: 2em;
+    width: 3em;
+    height: 3em;
     background-image: url(../icons/no-answer.svg);
-    background-size: 2em;
+    background-size: 3em;
     border-radius: 50%;
-    alignment: center;
+    border-width: 0px;
+}
+
+.friendButton{
+    width: 3em;
+    height: 3em;
+    background-size: 3em;
+    border-width: 0px;
+}
+
+.friendDelete{
+    background-image: url("../icons/friendDelete.svg");
+}
+
+.friendAdd{
+    background-image: url("../icons/friendAdd.svg");
 }
 
 .callback{
@@ -140,8 +169,17 @@ body {
     height: 3em;
     background-image: url("../icons/phone-24px.svg");
     background-size: 3em;
-    alignment: center;
     border-radius: 50%;
     border-width: 0px;
-    background-color: white;
+}
+
+.close{
+    width: 1em;
+    height: 1em;
+    background-image: url("../icons/close-24px.svg");
+    background-size: 1em;
+    border-radius: 50%;
+    border-width: 0px;
+    padding-top: 10px;
+    padding-right: 10px;
 }

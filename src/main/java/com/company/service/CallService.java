@@ -5,20 +5,14 @@ import com.company.dao.CallDAO;
 import com.company.dao.UserDAO;
 import com.company.model.MyCall;
 import com.company.model.Setting;
-import com.company.model.User;
 import com.twilio.Twilio;
 import com.twilio.base.ResourceSet;
 import com.twilio.rest.api.v2010.account.Call;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Map;
-
-import static com.company.controller.CallController.*;
 
 @Service
 public class CallService {
@@ -32,78 +26,74 @@ public class CallService {
     @Autowired
     private ApplicationSettingDao settingDao;
 
-    private final static String INBOUND = "INCOMING";
     private final static String OUTBOUND = "OUTGOING";
-    private final static String DIRECTION = "Direction";
+    private final static String QUEUED = "queued";
+    private final static String BUSY = "busy";
 
-    public User getCurrentUser(){
-        String username;
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        return userDAO.findByEmail(username);
-    }
-
-    public MyCall saveCall(Map<String, String> data){
+    public MyCall saveCall(String direction, MyCall call) {
         Setting setting = settingDao.getFirstBy();
         Twilio.init(setting.getAccountSid(), setting.getAuthToken());
-
-
 
         String callSid;
         boolean closedBeforeBeeps = false;
 
-        boolean outbound = data.get(DIRECTION).equals(OUTBOUND);
+        boolean outbound = direction.equals(OUTBOUND);
         if(outbound) {
-            ResourceSet<Call> calls = Call.reader().setParentCallSid(data.get(CALL_SID)).read();
+            ResourceSet<Call> calls = Call.reader().setParentCallSid(call.getCallSid()).read();
 
             if(calls.iterator().hasNext()){
                 Call childCall = calls.iterator().next();
                 callSid = childCall.getSid();
-
             }else {
                 closedBeforeBeeps = true;
-                callSid = data.get(CALL_SID);
+                callSid = call.getCallSid();
             }
 
         }else {
-            callSid = data.get(CALL_SID);
+            callSid = call.getCallSid();
         }
 
-        Call call = Call.fetcher(callSid).fetch();
-
-        String to = data.get(TO);
-        String from = data.get(FROM);
-
-        int toUser = userDAO.findIdByPhoneNumber(to);
-        int fromUser = userDAO.findIdByPhoneNumber(from);
-
-        DateTime startTime = call.getStartTime();
-        Timestamp date = new Timestamp(startTime.getMillis());
-
-        MyCall myCall = new MyCall(
-                callSid,
-                toUser,
-                fromUser,
-                to,
-                from,
-                call.getDuration(),
-                call.getStatus().toString(),
-                date);
-
-        if(outbound && !closedBeforeBeeps) {
-            callDAO.save(myCall);
-        }
 
         if(!closedBeforeBeeps) {
+            Call callSave = Call.fetcher(callSid).fetch();
+
+            String to = call.getToNumber();
+            String from = call.getFromNumber();
+
+            int toUser = userDAO.findIdByPhoneNumber(to);
+            int fromUser = userDAO.findIdByPhoneNumber(from);
+
+            DateTime startTime = callSave.getStartTime();
+            Timestamp date = new Timestamp(startTime.getMillis());
+
+            String status = callSave.getStatus().toString();
+            String duration = callSave.getDuration();
+
+            if (status.equals(QUEUED)) {
+                status = BUSY;
+                duration = "0";
+            }
+
+            MyCall myCall = new MyCall(
+                    callSid,
+                    toUser,
+                    fromUser,
+                    to,
+                    from,
+                    duration,
+                    status,
+                    date);
+
+            if (outbound) {
+                callDAO.save(myCall);
+            }
+
             return myCall;
-        }else {
+
+        } else {
             return null;
         }
+
     }
 }

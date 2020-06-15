@@ -6,8 +6,8 @@ import com.company.dao.UserDAO;
 import com.company.model.MyCall;
 import com.company.model.Setting;
 
-import com.company.model.User;
 import com.company.service.CallService;
+import com.company.service.UserService;
 import com.company.utils.CallUtils;
 import com.google.common.collect.Lists;
 import com.twilio.jwt.client.OutgoingClientScope;
@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import com.twilio.jwt.client.ClientCapability;
 import com.twilio.jwt.client.IncomingClientScope;
@@ -40,7 +39,6 @@ public class CallController {
     public final static String TO = "To";
     public final static String CALL_SID = "CallSid";
 
-
     @Autowired
     private UserDAO userDAO;
 
@@ -51,21 +49,18 @@ public class CallController {
     private CallService callService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private CallDAO callDAO;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
-
-    @GetMapping("/currentUser")
-    public User currentUser(){
-        User user = callService.getCurrentUser();
-        return user;
-    }
 
     @GetMapping("/token")
     public void token(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Setting setting = settingDao.getFirstBy();
-        String username = callService.getCurrentUser().getPhonenumber().substring(1);
+        String username = userService.getCurrentUser().getPhonenumber().substring(1);
 
 
         OutgoingClientScope outgoingScope = new OutgoingClientScope.Builder(setting.getApplicationSid()).clientName(username).build();
@@ -114,14 +109,14 @@ public class CallController {
         }
     }
 
-    @PostMapping("/save")
-    public MyCall save(@RequestBody Map<String,String> data){
-
-        return callService.saveCall(data);
+    @PostMapping("/save/{direction}")
+    public MyCall save(@PathVariable String direction, @RequestBody MyCall call){
+        return callService.saveCall(direction, call);
     }
 
-    @GetMapping("/getCallsList/{id}")
-    public List<MyCall> getCallsList(@PathVariable int id){
+    @GetMapping("/callsList/{id}")
+    public List<MyCall> callsList(@PathVariable int id){
+
         return callDAO.findCallsById(id);
     }
 }
