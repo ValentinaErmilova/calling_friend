@@ -31,6 +31,8 @@ myApp.controller('HistoryController',
                 $rootScope.$emit ('callback', call.toNumber)
             }
         }
+
+
     }
 )
 
