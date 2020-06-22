@@ -1,3 +1,4 @@
+// common functions and constants for all controllers
 const VALID = 'valid';
 const INVALID = 'invalid';
 const SAME = 'same';

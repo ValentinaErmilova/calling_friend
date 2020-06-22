@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+// Controller for receiving login(login.html) page or main page (history.html)
 @Controller
 public class LoginController {
 

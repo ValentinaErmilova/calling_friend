@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Service for working with the user
 @Service
 public class UserService {
 
@@ -42,6 +43,7 @@ public class UserService {
 
     }
 
+    //  retrieve the user details in Spring Security
     public User getCurrentUser() {
         String username;
 

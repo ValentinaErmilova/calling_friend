@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+// Exit the application after pressing the corresponding button
 @RestController
 @RequestMapping("/rest")
 public class LogoutController {

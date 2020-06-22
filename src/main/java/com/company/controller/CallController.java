@@ -29,6 +29,7 @@ import com.twilio.jwt.client.IncomingClientScope;
 import com.twilio.jwt.client.Scope;
 import com.twilio.twiml.voice.Client;
 
+// Controller for managing calls
 @RestController
 @RequestMapping("/rest")
 public class CallController {
@@ -62,8 +63,10 @@ public class CallController {
         Setting setting = settingDao.getFirstBy();
         String username = userService.getCurrentUser().getPhonenumber().substring(1);
 
-
+        // indicate that the user can make outgoing calls
         OutgoingClientScope outgoingScope = new OutgoingClientScope.Builder(setting.getApplicationSid()).clientName(username).build();
+
+        // indicate that the user can receive incoming calls
         IncomingClientScope incomingScope = new IncomingClientScope(username);
 
         List<Scope> scopes = Lists.newArrayList(outgoingScope, incomingScope);
@@ -92,7 +95,10 @@ public class CallController {
             VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
             if (CallUtils.checkNumber(from) && CallUtils.checkNumber(to)) {
 
+                // connection of the current subscriber to the other side
                 Dial.Builder dialBuilder = new Dial.Builder().callerId(from);
+
+                // who are we calling
                 Client client = new Client.Builder(to).build();
                 dialBuilder = dialBuilder.client(client);
                 Dial dial = dialBuilder.build();
@@ -108,6 +114,7 @@ public class CallController {
 
             response.setContentType(CAll_CONTENT_TYPE);
 
+            // return the answer with instructions as xml
             response.getWriter().print(twiml.toXml());
         } catch (TwiMLException e) {
             LOGGER.warn("",e);

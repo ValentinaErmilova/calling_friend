@@ -6,9 +6,9 @@ import com.company.model.User;
 import com.company.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
+// Controller for working with the user (information about the user, his friends, etc.)
 @RestController
 @RequestMapping("/rest")
 public class UserController {
@@ -43,19 +43,21 @@ public class UserController {
         return userService.addFriend(userId,phoneNumber);
     }
 
+    // number of users with this phone
     @GetMapping("/countByPhone")
     public int countByPhone(@RequestParam(name = "phoneNumber") String phoneNumber){
         return userDAO.countByPhonenumber(phoneNumber);
     }
 
+    // number of users with such mail
     @GetMapping("/countByEmail")
     public int countByEmail(@RequestParam(name = "email") String email){
         return userDAO.countByEmail(email);
     }
 
+
     @PostMapping("/userRegistration")
     public User userRegistration(@RequestBody User user){
-        System.out.println(user);
         userService.save(user);
         return user;
     }
