@@ -13,8 +13,15 @@ let myApp = angular.module('myApp', ['ngRoute'])
     });
 
 
-myApp.controller('MainCtrl', function ($scope, $http) {
+myApp.controller('MainCtrl', function ($window, $scope, $http) {
+    $scope.logout = function () {
+        $http({
+            method: 'POST',
+            url: '/rest/logout'
+        })
 
+        $window.location.href = '/login';
+    }
 });
 
 function loadData($http,$scope) {
