@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Calling friend</title>
 
     <script type = "text/javascript"
@@ -22,8 +25,6 @@
     <script type="text/javascript" src="js/src/CallController.js" ></script>
     <script type="text/javascript" src="js/src/FriendController.js" ></script>
     <script type="text/javascript" src="js/src/UIScript.js" ></script>
-
-    <!--<base href = "/">-->
 </head>
 
 <body ng-app="myApp" ng-controller="MainCtrl">
@@ -39,29 +40,24 @@
             <a class="navbar-brand" href="#!friends">Friends</a>
             <a class="navbar-brand" href="" ng-click="logout()">Logout</a>
 
-
         </ul>
     </nav>
 
 
 
-    <div id = "mainDiv" class="container-fluid" align="center">
-        <div id="mainDivRow" class="row">
+    <div class="container" align="center">
+        <div class="row">
 
-            <div class="col-0 col-md-0 col-lg-3">
-                <div class="column">
-                </div>
+            <div class="col-md-0 order-md-1 col-lg-3">
             </div>
 
-            <div class="col-12 col-md-8 col-lg-6">
+            <div class="col-12 order-2 col-md-8 order-md-2 col-lg-6">
                 <div class="ng-view"></div>
             </div>
 
-            <!--<div class="d-none d-md-block col-md-4 col-lg-3">-->
-            <div class="d-none d-md-block col-md-4 col-lg-3" ng-controller="CallController">
-                <div id = "callColumn" class="column call-column">
-
-                    <div id = "dial-pad-panel" class="dial-pad-panel" ng-show="TWconnected">
+            <div class="col-12 order-1 col-md-4 order-md-3 col-lg-3" ng-controller="CallController">
+                <div class="column call-column sticky-top">
+                    <div class=" d-none d-md-block dial-pad-panel" ng-show="TWconnected">
 
                         <form>
 
@@ -121,23 +117,23 @@
 
                     </div>
 
-                    <div id="callPanel" class="call-panel" ng-show="ActiveCall">
+                    <div class="call-panel" ng-show="ActiveCall">
 
-                        <div id = "incomingCall" ng-show="ActiveInbound">
+                        <div ng-show="ActiveInbound">
                             <h4>Incoming call from: </h4>
                             <h4>{{from}}</h4>
-                            <div id="incomingButtons" ng-show="InboundOption">
-                                <button ng-click="accept()" class="btn btn-success" type="submit" id="acceptCall">accept call</button>
-                                <button ng-click="reject()" class="btn btn-warning" type="submit" id="rejectCall">reject call</button>
+                            <div ng-show="InboundOption">
+                                <button ng-click="accept()" class="btn btn-success" type="submit">accept call</button>
+                                <button ng-click="reject()" class="btn btn-warning" type="submit">reject call</button>
                             </div>
                         </div>
 
-                        <div id = "outgoingCall" ng-show="ActiveOutbound">
+                        <div ng-show="ActiveOutbound">
                             <p>Outgoing call to:</p>
                             <p>{{to}}</p>
                         </div>
 
-                        <button class="btn btn-danger" ng-click="endCall()" type="submit" ng-show="EndActive" id="endCall()">end call</button>
+                        <button class="btn btn-danger" ng-click="endCall()" type="submit" ng-show="EndActive">end call</button>
                     </div>
                 </div>
 

@@ -10,7 +10,7 @@ import java.io.IOException;
 
 @ControllerAdvice
 public class ExceptionController extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(UserException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     public void springHandleNotFound(HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.NOT_FOUND.value());
     }

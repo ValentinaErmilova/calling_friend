@@ -1,6 +1,6 @@
 package com.company.service;
 
-import com.company.exception.UserException;
+import com.company.exception.UserNotFoundException;
 import com.company.model.User;
 import com.company.dao.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class UserService {
 
         User friend = userDAO.findByPhonenumber(phoneNumber);
         if (friend == null) {
-            throw new UserException();
+            throw new UserNotFoundException();
         }
 
         userDAO.addFriend(userID, friend.getId());

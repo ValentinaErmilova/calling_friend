@@ -42,4 +42,23 @@ public class UserController {
     public User addFriend(@PathVariable int userId, @RequestParam(name = "phoneNumber") String phoneNumber) {
         return userService.addFriend(userId,phoneNumber);
     }
+
+    @GetMapping("/countByPhone")
+    public int countByPhone(@RequestParam(name = "phoneNumber") String phoneNumber){
+        return userDAO.countByPhonenumber(phoneNumber);
+    }
+
+    @GetMapping("/countByEmail")
+    public int countByEmail(@RequestParam(name = "email") String email){
+        return userDAO.countByEmail(email);
+    }
+
+    @PostMapping("/userRegistration")
+    public User userRegistration(@RequestBody User user){
+        System.out.println(user);
+        userService.save(user);
+        return user;
+    }
+
+
 }

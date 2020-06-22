@@ -2,11 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
 
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Calling friend</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-
 
 </head>
 
@@ -14,12 +16,7 @@
 
 <div class="container-fluid" align="center">
 
-    <div th:if="${param.error}" >
-        Invalid username and password.
-    </div>
-    <div th:if="${param.logout}">
-        You have been logged out.
-    </div>
+
 
     <h1><i>Calling friend</i></h1>
     <h2>Sign in</h2>
@@ -38,9 +35,15 @@
                 <input class="form-control" type="password"  placeholder="Enter password" required name="password"/>
             </div>
 
+            <div lass="col-md-4 mb-3" th:if="${param.error}">
+                Invalid username and/or password
+            </div>
+
             <div class="col-md-4 mb-3">
                 <button class="btn btn-primary" type="submit">Login</button>
             </div>
+
+
         </div>
     </form>
 

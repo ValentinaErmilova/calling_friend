@@ -22,6 +22,10 @@ public interface UserDAO extends JpaRepository<User,Integer> {
             "from users u join friends f on f.friend_id = u.id where f.user_id =:id", nativeQuery = true)
     List<User> getFriends(@Param("id") Integer id);
 
+    int countByPhonenumber(String phoneUmber);
+
+    int countByEmail(String email);
+
     @Modifying
     @Transactional
     @Query(value = "delete from friends where user_id =:userId and friend_id =:friendId", nativeQuery = true)

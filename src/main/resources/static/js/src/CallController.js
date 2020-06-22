@@ -28,8 +28,7 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
     }
 
     $rootScope.$on('callback', function (event, number) {
-        let phoneNumber = numberInput(number);
-        $scope.toNumber = phoneNumber;
+        $scope.toNumber = numberInput(number);
         $scope.outgoingCall();
     })
 
@@ -53,9 +52,7 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
             if($scope.ActiveCall !== true) {
                 $scope.connection = conn;
 
-                let from = inputFormat(conn.parameters.From);
-
-                $scope.from = from;
+                $scope.from = inputFormat(conn.parameters.From);
 
                 $scope.$apply(function () {
                     $scope.TWconnected = false;

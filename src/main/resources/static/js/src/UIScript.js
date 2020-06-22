@@ -9,6 +9,8 @@ const NOTFULL = 'The number is not fully entered';
 const SAMENUMBER = 'You can’t call yourself';
 const SAMEFRIEND = 'You can’t add yourself to friends';
 const ALREADYHAVE = 'You already have such friend'
+const PHONE_EXISTS = 'User with such a phone already exists'
+const EMAIL_EXISTS = 'User with such a email already exists'
 
 function validation(phoneNumber, myNumber) {
     phoneNumber = spaceDelete(phoneNumber);
@@ -35,7 +37,7 @@ function spaceDelete(phoneNumber) {
 function inputFormat(phoneNumber) {
     if(phoneNumber.length < 15) {
         phoneNumber = spaceDelete(phoneNumber);
-        const formatted = phoneNumber.replace(/(\d{0,1})?(\d{1,2})(\d{1})?(\d{1,3})?(\d{1,4})?/, function (_, p1, p2, p3, p4, p5) {
+        return phoneNumber.replace(/(\d{0,1})?(\d{1,2})(\d{1})?(\d{1,3})?(\d{1,4})?/, function (_, p1, p2, p3, p4, p5) {
             let output = "+"
             if (p1) output += `${p1} `;
             if (p2) output += `${p2}`;
@@ -44,7 +46,6 @@ function inputFormat(phoneNumber) {
             if (p5) output += ` ${p5}`
             return output;
         });
-        return formatted;
     }else {
         return phoneNumber;
     }
