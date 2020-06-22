@@ -37,10 +37,6 @@ public class CallController {
     private final static String CAll_CONTENT_TYPE = "application/xml";
     public final static String FROM = "From";
     public final static String TO = "To";
-    public final static String CALL_SID = "CallSid";
-
-    @Autowired
-    private UserDAO userDAO;
 
     @Autowired
     private ApplicationSettingDao settingDao;
@@ -56,6 +52,10 @@ public class CallController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
 
+    // Twilio Client relies on capability tokens to sign communications from devices to Twilio.
+    // These tokens are a secure way of setting up your device to access various features of Twilio.
+    // Capability tokens allow you to add Twilio capabilities to web and mobile applications
+    // Create a token on your server and specify what capabilities you'd like your device to have.
     @GetMapping("/token")
     public void token(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -78,6 +78,11 @@ public class CallController {
         response.getWriter().print(token);
     }
 
+    // Twilio account must be configured so that it receives TwiML( XML document with special tags defined by
+    // Twilio to help you build your Programmable Voice application), which will instruct Twilio how to
+    // connect an outgoing call. In our case, we want to provide him with the name of the client (phone number)
+    // for the call.
+    // For every outgoing call, Twilio makes this request to receive instructions for processing the call
     @GetMapping("/doCall")
     public void doCall(HttpServletRequest request, HttpServletResponse response) throws IOException{
         String from = request.getParameter(FROM);
@@ -109,14 +114,15 @@ public class CallController {
         }
     }
 
+    // Save the call after completion, direction = outgoing or incoming
     @PostMapping("/save/{direction}")
     public MyCall save(@PathVariable String direction, @RequestBody MyCall call){
         return callService.saveCall(direction, call);
     }
 
+    // Receive user calls by id
     @GetMapping("/callsList/{id}")
     public List<MyCall> callsList(@PathVariable int id){
-
         return callDAO.findCallsById(id);
     }
 }
