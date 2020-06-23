@@ -1,3 +1,4 @@
+//installation of controllers, setting up switching between call history and friends list
 let myApp = angular.module('myApp', ['ngRoute'])
     .config(function($routeProvider) {
             $routeProvider
@@ -12,7 +13,6 @@ let myApp = angular.module('myApp', ['ngRoute'])
                 .otherwise({redirectTo: '/calls'});
     });
 
-
 myApp.controller('MainCtrl', function ($window, $scope, $http) {
     $scope.logout = function () {
         $http({
@@ -24,6 +24,7 @@ myApp.controller('MainCtrl', function ($window, $scope, $http) {
     }
 });
 
+// function to request a list of ringing and friends
 function loadData($http,$scope) {
     $http({
         method: 'GET',

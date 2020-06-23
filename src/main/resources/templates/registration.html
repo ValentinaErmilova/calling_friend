@@ -1,62 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
 <head>
-
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Calling friend</title>
-    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+
+
+    <script type="text/javascript" src="js/src/RegistrationController.js" ></script>
+    <script type="text/javascript" src="js/src/UIScript.js" ></script>
 </head>
 
-<body>
+<body ng-app="regApp" ng-controller="regController">
 
 <div class="container-fluid">
     <h1>Registration</h1>
 
-    <form th:object="${registration}" th:action="@{/registration}" method="post">
+    <form class="needs-validation" novalidate>
 
         <div class="form-row">
             <div class="col-md-4 mb-3">
                 <label>First name</label>
-                <input class="form-control" type="text" th:field="*{firstname}" placeholder="Enter first name" required>
+                <input ng-model="user.firstname" maxlength=50 class="form-control" type="text" placeholder="Enter first name" required>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label>Last name</label>
-                <input class="form-control" type="text" th:field="*{lastname}" placeholder="Enter last name" required>
+                <input ng-model="user.lastname" maxlength=50 class="form-control" type="text" placeholder="Enter last name" required>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label>Age</label>
-                <input type="text" th:field="*{age}" class="form-control" placeholder="Enter age" required>
+                <input ng-model="user.age" maxlength=3 type="text" class="form-control" placeholder="Enter age" required>
             </div>
         </div>
 
         <div class="form-row">
+
             <div class="col-md-4 mb-3">
                 <label>Phone number</label>
-                <input class="form-control" type="tel" th:field="*{phonenumber}" placeholder="Enter rhone number"
-                       required>
+
+                <input class="form-control" ng-model="user.phonenumber" ng-model-options="{allowInvalid: true}" ng-change="change()"
+                       pattern="[+][0-9]{1} [0-9]{3} [0-9]{3} [0-9]{4}"
+                       maxlength="15"
+                       minlength="15"
+                       ng-class="{'is-invalid': phoneInvalid}"
+                       placeholder="+1 123 456 7890" required>
+
+                <div class="invalid-feedback">
+                    {{phoneMessage}}
+                </div>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label>Email address</label>
-                <input class="form-control" type="email" th:field="*{email}" placeholder="Enter email" required>
+                <input ng-class="{'is-invalid': emailInvalid}"
+                        ng-model="user.email" maxlength=50 class="form-control" type="email" placeholder="Enter email"
+                        required>
+
+                <div class="invalid-feedback">
+                    {{emailMessage}}
+                </div>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label>Password</label>
-                <input class="form-control" type="password" th:field="*{password}" placeholder="Password" required>
+                <input ng-model="user.password" minlength="6" class="form-control" type="password" placeholder="Password" required>
+                <small>minimum 6 characters</small>
             </div>
         </div>
 
         <button class="btn btn-primary" type="submit">Registration</button>
+        <a class="btn btn-primary" href="/login">login page</a>
 
     </form>
 </div>
 
+<div class="container-fluid" ng-show="successRegistration">
+    <h1>Success registration</h1>
+</div>
 
 </body>
 

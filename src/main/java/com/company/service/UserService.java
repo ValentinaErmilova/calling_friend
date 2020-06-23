@@ -1,6 +1,6 @@
 package com.company.service;
 
-import com.company.exception.UserException;
+import com.company.exception.UserNotFoundException;
 import com.company.model.User;
 import com.company.dao.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Service for working with the user
 @Service
 public class UserService {
 
@@ -33,7 +34,7 @@ public class UserService {
 
         User friend = userDAO.findByPhonenumber(phoneNumber);
         if (friend == null) {
-            throw new UserException();
+            throw new UserNotFoundException();
         }
 
         userDAO.addFriend(userID, friend.getId());
@@ -42,6 +43,7 @@ public class UserService {
 
     }
 
+    //  retrieve the user details in Spring Security
     public User getCurrentUser() {
         String username;
 

@@ -29,6 +29,7 @@ import com.twilio.jwt.client.IncomingClientScope;
 import com.twilio.jwt.client.Scope;
 import com.twilio.twiml.voice.Client;
 
+// Controller for managing calls
 @RestController
 @RequestMapping("/rest")
 public class CallController {
@@ -37,10 +38,6 @@ public class CallController {
     private final static String CAll_CONTENT_TYPE = "application/xml";
     public final static String FROM = "From";
     public final static String TO = "To";
-    public final static String CALL_SID = "CallSid";
-
-    @Autowired
-    private UserDAO userDAO;
 
     @Autowired
     private ApplicationSettingDao settingDao;
@@ -56,14 +53,20 @@ public class CallController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CallController.class);
 
+    // Twilio Client relies on capability tokens to sign communications from devices to Twilio.
+    // These tokens are a secure way of setting up your device to access various features of Twilio.
+    // Capability tokens allow you to add Twilio capabilities to web and mobile applications
+    // Create a token on your server and specify what capabilities you'd like your device to have.
     @GetMapping("/token")
     public void token(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Setting setting = settingDao.getFirstBy();
         String username = userService.getCurrentUser().getPhonenumber().substring(1);
 
-
+        // indicate that the user can make outgoing calls
         OutgoingClientScope outgoingScope = new OutgoingClientScope.Builder(setting.getApplicationSid()).clientName(username).build();
+
+        // indicate that the user can receive incoming calls
         IncomingClientScope incomingScope = new IncomingClientScope(username);
 
         List<Scope> scopes = Lists.newArrayList(outgoingScope, incomingScope);
@@ -78,6 +81,11 @@ public class CallController {
         response.getWriter().print(token);
     }
 
+    // Twilio account must be configured so that it receives TwiML( XML document with special tags defined by
+    // Twilio to help you build your Programmable Voice application), which will instruct Twilio how to
+    // connect an outgoing call. In our case, we want to provide him with the name of the client (phone number)
+    // for the call.
+    // For every outgoing call, Twilio makes this request to receive instructions for processing the call
     @GetMapping("/doCall")
     public void doCall(HttpServletRequest request, HttpServletResponse response) throws IOException{
         String from = request.getParameter(FROM);
@@ -87,7 +95,10 @@ public class CallController {
             VoiceResponse.Builder responseBuilder = new VoiceResponse.Builder();
             if (CallUtils.checkNumber(from) && CallUtils.checkNumber(to)) {
 
+                // connection of the current subscriber to the other side
                 Dial.Builder dialBuilder = new Dial.Builder().callerId(from);
+
+                // who are we calling
                 Client client = new Client.Builder(to).build();
                 dialBuilder = dialBuilder.client(client);
                 Dial dial = dialBuilder.build();
@@ -103,20 +114,22 @@ public class CallController {
 
             response.setContentType(CAll_CONTENT_TYPE);
 
+            // return the answer with instructions as xml
             response.getWriter().print(twiml.toXml());
         } catch (TwiMLException e) {
             LOGGER.warn("",e);
         }
     }
 
+    // Save the call after completion, direction = outgoing or incoming
     @PostMapping("/save/{direction}")
     public MyCall save(@PathVariable String direction, @RequestBody MyCall call){
         return callService.saveCall(direction, call);
     }
 
+    // Receive user calls by id
     @GetMapping("/callsList/{id}")
     public List<MyCall> callsList(@PathVariable int id){
-
         return callDAO.findCallsById(id);
     }
 }

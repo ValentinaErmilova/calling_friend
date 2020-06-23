@@ -25,7 +25,8 @@ body {
     border-style: solid;
     border-width: 0px;
     border-radius: 10px;
-    margin: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     background-color: #ffffff;
     padding: 10px;
 }
@@ -103,6 +104,8 @@ body {
 }
 
 .mytable-row {
+    text-align: center;
+    alignment: center;
     border-radius: 10px;
     margin: 10px;
     padding: 5px;
@@ -115,12 +118,6 @@ body {
     vertical-align: top;
 }
 
-.mytable-column {
-    align-content: center;
-    display: table-cell;
-    margin: 10px;
-    text-align: center;
-}
 
 .incoming{
     width: 3em;

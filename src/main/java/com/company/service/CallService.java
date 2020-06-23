@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
+// Service for working with a call
 @Service
 public class CallService {
 
@@ -30,7 +31,7 @@ public class CallService {
     private final static String QUEUED = "queued";
     private final static String BUSY = "busy";
 
-
+    // Save the call after completion
     public MyCall saveCall(String direction, MyCall call) {
         Setting setting = settingDao.getFirstBy();
         Twilio.init(setting.getAccountSid(), setting.getAuthToken());
@@ -39,6 +40,8 @@ public class CallService {
         boolean closedBeforeBeeps = false;
 
         boolean outbound = direction.equals(OUTBOUND);
+        // the duration of an outgoing call in Twilio is calculated from the accounting of beeps, therefore,
+        // to get the correct  duration of the call you need to get a call-child (incoming)
         if(outbound) {
             ResourceSet<Call> calls = Call.reader().setParentCallSid(call.getCallSid()).read();
 
@@ -55,6 +58,8 @@ public class CallService {
         }
 
 
+        // if the call was completed before listening to the trial period message,
+        // then we don’t save it, because the call itself wasn't
         if(!closedBeforeBeeps) {
             Call callSave = Call.fetcher(callSid).fetch();
 

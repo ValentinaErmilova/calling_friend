@@ -1,3 +1,4 @@
+// Сontroller for managing calls on ui side
 myApp.controller("CallController", function($scope, $rootScope, $http) {
 
     let NeedSetDefault = true;
@@ -7,6 +8,7 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
         let to = $scope.toNumber;
         let from = $scope.user.phonenumber;
 
+        // if the number is entered correctly and there is no active call, then we make a new outgoing call
         if($scope.valid && $scope.ActiveCall !== true){
             $scope.TWconnected = false;
             $scope.ActiveCall = true;
@@ -27,16 +29,22 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
 
     }
 
+    // this function is called if the user calls back from the call page or from the list of friends
     $rootScope.$on('callback', function (event, number) {
-        let phoneNumber = numberInput(number);
-        $scope.toNumber = phoneNumber;
+        $scope.toNumber = numberInput(number);
         $scope.outgoingCall();
     })
 
+    // Capability token request
     $http({
         method: 'GET',
         url: '/rest/token'
     }).then(function success(response) {
+        // The Twilio.Device object is available when twilio.js is included in page.
+        // It represents a soft device, the client that provides connections into Twilio.
+
+        // pass the token that we received from the server
+        // now we can make calls
         Twilio.Device.setup(response.data,{allowIncomingWhileBusy : false});
 
         Twilio.Device.ready(function() {
@@ -49,13 +57,12 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
             console.log('Error: ' + error.message);
         });
 
+        // incoming call processing
         Twilio.Device.incoming(function(conn) {
             if($scope.ActiveCall !== true) {
                 $scope.connection = conn;
 
-                let from = inputFormat(conn.parameters.From);
-
-                $scope.from = from;
+                $scope.from = inputFormat(conn.parameters.From);
 
                 $scope.$apply(function () {
                     $scope.TWconnected = false;
@@ -76,6 +83,7 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
 
         });
 
+        // call termination processing
         Twilio.Device.disconnect(function(conn){
             if(NeedSetDefault) {
                 $scope.$apply(function() {
@@ -155,6 +163,7 @@ myApp.controller("CallController", function($scope, $rootScope, $http) {
         return phoneNumber;
     }
 
+    // function sends to the server information about the call to be saved
     function DisconnectCall(conn) {
         let direction = conn._direction;
         let to;

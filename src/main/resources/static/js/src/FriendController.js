@@ -1,3 +1,4 @@
+// Сontroller for managing friends on ui side
 myApp.controller("FriendController", function($scope, $rootScope, $http) {
 
     $scope.addF = false;
@@ -23,6 +24,7 @@ myApp.controller("FriendController", function($scope, $rootScope, $http) {
         $scope.addF = true;
     }
 
+    // add friend
     $scope.addFriend = function () {
 
         let alreadyHave = false;
@@ -37,7 +39,8 @@ myApp.controller("FriendController", function($scope, $rootScope, $http) {
             }
         })
 
-
+        // if the phone number is entered correctly and there is no contact in the friends list with this
+        // number we are trying to add a user with this number to your contact list
         if($scope.valid && !alreadyHave) {
             $http({
                 method: 'POST',
@@ -53,6 +56,7 @@ myApp.controller("FriendController", function($scope, $rootScope, $http) {
 
                 }
             }, function error(response) {
+                // if the user with the specified phone number does not exist, an error message is displayed
                 $scope.valid = false;
                 $scope.invalid = true;
                 $scope.invalidMessage = response.data.message;
@@ -60,6 +64,7 @@ myApp.controller("FriendController", function($scope, $rootScope, $http) {
         }
     }
 
+    // close add panel
     $scope.addClose = function(){
         $scope.addF = false;
         $scope.friendNumber = '';
